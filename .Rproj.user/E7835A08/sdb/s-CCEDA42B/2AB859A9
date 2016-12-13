@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Main function for creating different types of decision trees\n#'\n#' @param formula a formula, weight a response to left of ~.\n#' @param data Data frame to run models on\n#' @param weights Optional weights for each case.\n#' @param frac.sub What fraction of data to put into train dataset. 1-frac.sub\n#'        is allocated to test dataset.\n#'\n#' @export\n#' @import rpart\n#' @import party\n#' @import evtree\n#' @import rattle\n#'\n\n\ndtree = function(formula,\n                 data,\n                 weights,\n                 perc.sub=.5){\n\n}\n",
+    "created" : 1481645641848.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3062485711",
+    "id" : "2AB859A9",
+    "lastKnownWriteTime" : 1481646143,
+    "last_content_update" : 1481646143867,
+    "path" : "~/GitHub/dtree/R/dtree.R",
+    "project_path" : "R/dtree.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

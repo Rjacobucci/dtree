@@ -7,7 +7,7 @@
 
 summary.dtree <- function(object,...){
 
-  ret <- list(complexity = object$complexity,
+  ret <- list(results = object$return.matrix,
               response.type = object$response.type,
               call = object$call)
 

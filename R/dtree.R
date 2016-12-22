@@ -2,6 +2,8 @@
 #'
 #' @param formula a formula, weight a response to left of ~.
 #' @param data Data frame to run models on
+#' @param methods Which tree methods to use. Defaults to all:
+#'        rpart, tree, ctree, evtree
 #' @param weights Optional weights for each case.
 #' @param frac.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset.
@@ -9,6 +11,7 @@
 #'
 #' @export
 #' @import rpart
+#' @import tree
 #' @import party
 #' @import evtree
 #' @import caret
@@ -17,15 +20,16 @@
 
 dtree = function(formula,
                  data,
+                 methods=c("rpart","tree","ctree","evtree"),
                  weights,
                  perc.sub=.5,
                  prune=TRUE){
 
   ret <- list()
 
-  complexity <- matrix(NA,3,6)
-  rownames(complexity) <- c("rpart","evtree","ctree")
-  colnames(complexity) <- c("nodes","nvar","nsplits","fit.cv","fit.train","fit.test")
+  return.matrix <- matrix(NA,length(methods),8)
+  rownames(return.matrix) <- methods
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
 
 
   ids <- sample(nrow(data),nrow(data)*perc.sub)
@@ -59,55 +63,28 @@ dtree = function(formula,
   # ----------------------------------------------------------------
 
 
-  rpart.out <- rpart(formula,data=data.train)
+  if(any(methods=="rpart")){
 
-  if(class.response == "numeric" | class.response == "integer"){
-    pred1 <- predict(rpart.out)
-    #complexity["rpart","fit.train"] <- cor(pred1,data.train[,response])**2
-  }else{
-    #complexity["rpart","fit.train"] <- NA
+  ret1 <- rpart_ret(formula, data.train,data.test, prune, class.response,response)
+  return.matrix["rpart",] <- ret1$vec
+  ret$rpart.out <- ret1$rpart.ret
+
+
+
   }
 
+  # --------------------------------------------------
+
+  # Tree
+
+  # --------------------------------------------------
+
+  if(any(methods == "tree")){
 
 
 
-  cp <- rpart.out$cptable
-  min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
-  complexity["rpart","nsplits"] <- cp[min.error,"nsplit"]
-  complexity["rpart","fit.cv"] <- cp[min.error,"xerror"]
-  complexity["rpart","fit.train"] <- cp[min.error,"rel error"]
 
-  if(prune == TRUE){
-    rpart.ret <- prune.rpart(rpart.out,cp[min.error,"CP"])
-  }else{
-    rpart.ret <- rpart.out
   }
-
-
-  vars <- rpart.ret$frame[,"var"]
-  vars2 <- vars[vars != "<leaf>"]
-  complexity["rpart","nvar"] <- length(unique(vars2))
-
-  complexity["rpart","nodes"] <- length(vars[vars == "<leaf>"])
-
-  if(class.response == "numeric" | class.response == "integer"){
-
-    complexity["rpart","fit.test"] <- cor(predict(rpart.ret,data.test),data.test[,response])**2
-  }else{
-    complexity["rpart","fit.test"] <- NA
-  }
-
-  ret$rpart.out <- rpart.ret
-
-  #----------------------------------------------------
-
-  # Evtree
-
-  # ---------------------------------------------------
-
-  evtree.out <- evtree(formula,data=data.train)
-  ret$evtree.out <- evtree.out
-
 
   # ----------------------------------------------------
 
@@ -115,12 +92,29 @@ dtree = function(formula,
 
   # ----------------------------------------------------
 
-  ctree.out <- ctree(formula,data=data.train)
+  if(any(methods == "ctree")){
+    ret3 <- ctree_ret(formula, data.train,data.test, class.response,response)
+    return.matrix["ctree",] <- ret3$vec
+    ret$ctree.out <- ret3$ctree.ret
+  }
 
-  ret$ctree.out <- ctree.out
+
+  #----------------------------------------------------
+
+  # Evtree
+
+  # ---------------------------------------------------
+
+  if(any(methods == "evtree")){
+    ret4 <- evtree_ret(formula, data.train,data.test, class.response,response)
+    return.matrix["evtree",] <- ret4$vec
+    ret$evtree.out <- ret4$evtree.ret
+  }
+
+
 
   ret$response.type <- class.response
-  ret$complexity <- complexity
+  ret$return.matrix <- return.matrix
   ret$call <- match.call()
   class(ret) <- "dtree"
   return(ret)

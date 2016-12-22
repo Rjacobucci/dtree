@@ -4,12 +4,16 @@
 \alias{dtree}
 \title{Main function for creating different types of decision trees}
 \usage{
-dtree(formula, data, weights, perc.sub = 0.5, prune = TRUE)
+dtree(formula, data, methods = c("rpart", "tree", "ctree", "evtree"), weights,
+  perc.sub = 0.5, prune = TRUE)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
 
 \item{data}{Data frame to run models on}
+
+\item{methods}{Which tree methods to use. Defaults to all:
+rpart, tree, ctree, evtree}
 
 \item{weights}{Optional weights for each case.}
 

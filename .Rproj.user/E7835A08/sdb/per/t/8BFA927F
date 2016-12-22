@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\ntree_ret <- function(formula, data.train, data.test, prune, class.response, response){\n\nret <- list()\n\nreturn.matrix <- matrix(NA,1,6)\ncolnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"fit.cv\",\"fit.train\",\"fit.test\")\n\ntree1 <- tree(formula,data.train)\ncv1 <- cv.tree(tree1)\n\nmin.loc <- which(min(cv1$dev) == cv1$dev)\nreturn.matrix[1,\"nodes\"] <- cv1$size[min.loc]\n\npruned.tree <- prune.tree(tree1,cv1$k[min.loc])\n\n#return.matrix[1,\"nsplits\"] <- cp[min.error,\"nsplit\"]\nreturn.matrix[1,\"fit.cv\"] <- cv1$dev[min.loc]/nrow(data.train)\n#return.matrix[1,\"fit.train\"] <- cp[min.error,\"rel error\"]\n\n#if(prune == TRUE){\n#  rpart.ret <- prune.rpart(rpart.out,cp[min.error,\"CP\"])\n#}else{\n#  rpart.ret <- rpart.out\n#}\n\n\n#vars <- rpart.ret$frame[,\"var\"]\n#vars2 <- vars[vars != \"<leaf>\"]\n#return.matrix[1,\"nvar\"] <- length(unique(vars2))\n\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  return.matrix[1,\"fit.test\"] <- cor(predict(tree1,data.test),data.test[,response])**2\n}else{\n  return.matrix[1,\"fit.test\"] <- NA\n}\n\n\nret$vec <- return.matrix\nret$rpart.ret <- tree1\nreturn(ret)\n\n}\n",
+    "created" : 1482428523306.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1951617508",
+    "id" : "8BFA927F",
+    "lastKnownWriteTime" : 1482432106,
+    "last_content_update" : 1482432106024,
+    "path" : "~/GitHub/dtree/R/tree_ret.R",
+    "project_path" : "R/tree_ret.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

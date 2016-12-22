@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Summary results from dtree.\n#'\n#' @param object An object from dtree.\n#' @param ... Other arguments.\n#' @export\n\n\nsummary.dtree <- function(object,...){\n\n  ret <- list(complexity = object$complexity,\n              response.type = object$response.type,\n              call = object$call)\n\n\n\n  class(ret) <- \"summary.dtree\"\n  print(ret)\n}\n",
+    "created" : 1482420886476.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "77035774",
+    "id" : "5C66A679",
+    "lastKnownWriteTime" : 1482424359,
+    "last_content_update" : 1482424359176,
+    "path" : "~/GitHub/dtree/R/summary.R",
+    "project_path" : "R/summary.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

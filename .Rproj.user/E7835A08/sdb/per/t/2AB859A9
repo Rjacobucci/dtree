@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Main function for creating different types of decision trees\n#'\n#' @param formula a formula, weight a response to left of ~.\n#' @param data Data frame to run models on\n#' @param weights Optional weights for each case.\n#' @param frac.sub What fraction of data to put into train dataset. 1-frac.sub\n#'        is allocated to test dataset.\n#' @param prune Whether to prune rpart tree\n#'\n#' @export\n#' @import rpart\n#' @import party\n#' @import evtree\n#' @import caret\n#'\n\n\ndtree = function(formula,\n                 data,\n                 weights,\n                 perc.sub=.5,\n                 prune=TRUE){\n\n  ret <- list()\n\n  complexity <- matrix(NA,3,6)\n  rownames(complexity) <- c(\"rpart\",\"evtree\",\"ctree\")\n  colnames(complexity) <- c(\"nodes\",\"nvar\",\"nsplits\",\"fit.cv\",\"fit.train\",\"fit.test\")\n\n\n  ids <- sample(nrow(data),nrow(data)*perc.sub)\n  data.train <- data[ids,]\n  data.test <- data[-ids,]\n\n\n\n  # parse out the response variable name\n  getResponseFormula <- function (object)\n  {\n    form <- formula(object)\n    if (!(inherits(form, \"formula\") && (length(form) == 3))) {\n      stop(\"'form' must be a two-sided formula\")\n    }\n    eval(parse(text = paste(\"~\", deparse(form[[2]]))))\n  }\n\n  response <- attr(terms(getResponseFormula(formula)),\"term.labels\")\n  # ------------------------------------------------------------------\n\n\n  class.response <- class(data.train[,response])\n\n\n\n  # ------------------------------------------------------------------\n\n  # Rpart\n\n  # ----------------------------------------------------------------\n\n\n  rpart.out <- rpart(formula,data=data.train)\n\n  if(class.response == \"numeric\" | class.response == \"integer\"){\n    pred1 <- predict(rpart.out)\n    #complexity[\"rpart\",\"fit.train\"] <- cor(pred1,data.train[,response])**2\n  }else{\n    #complexity[\"rpart\",\"fit.train\"] <- NA\n  }\n\n\n\n\n  cp <- rpart.out$cptable\n  min.error <- which(min(cp[,\"xerror\"]) == cp[,\"xerror\"])[1]\n  complexity[\"rpart\",\"nsplits\"] <- cp[min.error,\"nsplit\"]\n  complexity[\"rpart\",\"fit.cv\"] <- cp[min.error,\"xerror\"]\n  complexity[\"rpart\",\"fit.train\"] <- cp[min.error,\"rel error\"]\n\n  if(prune == TRUE){\n    rpart.ret <- prune.rpart(rpart.out,cp[min.error,\"CP\"])\n  }else{\n    rpart.ret <- rpart.out\n  }\n\n\n  vars <- rpart.ret$frame[,\"var\"]\n  vars2 <- vars[vars != \"<leaf>\"]\n  complexity[\"rpart\",\"nvar\"] <- length(unique(vars2))\n\n  complexity[\"rpart\",\"nodes\"] <- length(vars[vars == \"<leaf>\"])\n\n  if(class.response == \"numeric\" | class.response == \"integer\"){\n\n    complexity[\"rpart\",\"fit.test\"] <- cor(predict(rpart.ret,data.test),data.test[,response])**2\n  }else{\n    complexity[\"rpart\",\"fit.test\"] <- NA\n  }\n\n  ret$rpart.out <- rpart.ret\n\n  #----------------------------------------------------\n\n  # Evtree\n\n  # ---------------------------------------------------\n\n  evtree.out <- evtree(formula,data=data.train)\n  ret$evtree.out <- evtree.out\n\n\n  # ----------------------------------------------------\n\n  # Ctree\n\n  # ----------------------------------------------------\n\n  ctree.out <- ctree(formula,data=data.train)\n\n  ret$ctree.out <- ctree.out\n\n  ret$response.type <- class.response\n  ret$complexity <- complexity\n  ret$call <- match.call()\n  class(ret) <- \"dtree\"\n  return(ret)\n\n}\n",
+    "created" : 1481645641848.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2638215352",
+    "id" : "2AB859A9",
+    "lastKnownWriteTime" : 1482425110,
+    "last_content_update" : 1482425110339,
+    "path" : "~/GitHub/dtree/R/dtree.R",
+    "project_path" : "R/dtree.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

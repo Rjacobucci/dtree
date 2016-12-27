@@ -6,7 +6,13 @@ ret <- list()
 return.matrix <- matrix(NA,1,8)
 colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
 
-evtree.out <- evtree(formula,data.train)
+evtree.out <- try(evtree(formula,data.train),silent=TRUE)
+
+if(inherits(evtree.out, "try-error")){
+  return.matrix <- NA
+}else{
+
+
 
 
 
@@ -57,6 +63,7 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"misfit.test"] <- NA
 }
 
+}
 
 ret$vec <- return.matrix
 ret$evtree.ret <- evtree.out

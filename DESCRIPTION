@@ -1,10 +1,10 @@
 Package: dtree
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Title: Runs various decision tree algorithms in same interface
+Version: 0.0.0.999
+Author: Ross Jacobucci
+Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: GPL (>= 2)
 LazyData: TRUE
 RoxygenNote: 5.0.1

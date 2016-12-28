@@ -4,23 +4,23 @@
 \alias{dtree}
 \title{Main function for creating different types of decision trees}
 \usage{
-dtree(formula, data, methods = c("rpart", "tree", "ctree", "evtree"), weights,
-  perc.sub = 0.5, prune = TRUE)
+dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
+  weights, perc.sub = 0.5, prune = TRUE)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
 
 \item{data}{Data frame to run models on}
 
-\item{methods}{Which tree methods to use. Defaults to all:
-rpart, tree, ctree, evtree}
+\item{methods}{Which tree methods to use. Defaults:
+lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests}
 
 \item{weights}{Optional weights for each case.}
 
-\item{prune}{Whether to prune rpart tree}
-
-\item{frac.sub}{What fraction of data to put into train dataset. 1-frac.sub
+\item{perc.sub}{What fraction of data to put into train dataset. 1-frac.sub
 is allocated to test dataset.}
+
+\item{prune}{Whether to prune rpart tree}
 }
 \description{
 Main function for creating different types of decision trees

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(MASS) # for boston data\ndata(Boston)\n\n\nrpart.Boston <- rpart::rpart(medv ~., data=Boston,weights=NULL)\n#summary(rpart.Boston)\nplot(rpart.Boston);text(rpart.Boston)\n\nctree.Boston <- party::ctree(medv ~., data=Boston)\n\n\nout <- dtree(medv ~., data=Boston,methods=c(\"lm\",\"rpart\",\"rf\"))\n\nsummary(out)\n\nout\nplot(out$rpart.out);text(out$rpart.out)\nplot(out$evtree.out)\nplot(out$ctree.out)\n",
+    "created" : 1482848144824.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2475654720",
+    "id" : "1C8F177F",
+    "lastKnownWriteTime" : 1482960166,
+    "last_content_update" : 1482960166216,
+    "path" : "~/GitHub/dtree/example.R",
+    "project_path" : "example.R",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -2,8 +2,3 @@
 
 S3method(summary,dtree)
 export(dtree)
-import(caret)
-import(evtree)
-import(party)
-import(rpart)
-import(tree)

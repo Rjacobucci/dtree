@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "install.packages(\"evtree\", repos=\"http://R-Forge.R-project.org\")\n\nniter <- 100\nret.mat <- matrix(NA,niter,3)\n\nfor(i in 1:niter){\n  #dat <- sim_regDat(500,10,0)\n  #dat <- sim_regDat(500,100,30,rep(.8,30))\n  dat <- sim_regDat(500,10,0)\n  out <- dtree(y ~ ., dat,methods=c(\"rpart\",\"ctree\",\"evtree\"))\n\n  ret.mat[i,] <- out$return.matrix[,\"nodes\"]\n}\n\ncolMeans(ret.mat)\n",
+    "created" : 1482845526182.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3011262409",
+    "id" : "31A0EB20",
+    "lastKnownWriteTime" : 1482953452,
+    "last_content_update" : 1482953452928,
+    "path" : "~/GitHub/diss_paper/analyses/null_sim.R",
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -2,25 +2,20 @@
 #'
 #' @param formula a formula, weight a response to left of ~.
 #' @param data Data frame to run models on
-#' @param methods Which tree methods to use. Defaults to all:
-#'        rpart, tree, ctree, evtree
+#' @param methods Which tree methods to use. Defaults:
+#'        lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests
 #' @param weights Optional weights for each case.
-#' @param frac.sub What fraction of data to put into train dataset. 1-frac.sub
+#' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset.
 #' @param prune Whether to prune rpart tree
 #'
 #' @export
-#' @import rpart
-#' @import tree
-#' @import party
-#' @import evtree
-#' @import caret
 #'
 
 
 dtree = function(formula,
                  data,
-                 methods=c("rpart","tree","ctree","evtree"),
+                 methods=c("lm","rpart","tree","ctree","evtree"),
                  weights,
                  perc.sub=.5,
                  prune=TRUE){
@@ -53,6 +48,23 @@ dtree = function(formula,
 
 
   class.response <- class(data.train[,response])
+
+
+  # -----------------------------------------------------------------
+
+  # Linear (Logistic) Regression
+
+  # -----------------------------------------------------------------
+
+  if(any(methods=="lm")){
+
+    ret0 <- lm_ret(formula, data.train,data.test,class.response,response)
+    return.matrix["lm",] <- ret0$vec
+    ret$lm.out <- ret0$lm.ret
+
+
+
+  }
 
 
 
@@ -109,6 +121,18 @@ dtree = function(formula,
     ret4 <- evtree_ret(formula, data.train,data.test, class.response,response)
     return.matrix["evtree",] <- ret4$vec
     ret$evtree.out <- ret4$evtree.ret
+  }
+
+  #----------------------------------------------------
+
+  # Random Forests
+
+  # ---------------------------------------------------
+
+  if(any(methods == "rf")){
+    ret5 <- rf_ret(formula, data.train,data.test, class.response,response)
+    return.matrix["rf",] <- ret5$vec
+    ret$rf.out <- ret5$rf.ret
   }
 
 

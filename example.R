@@ -9,7 +9,7 @@ plot(rpart.Boston);text(rpart.Boston)
 ctree.Boston <- party::ctree(medv ~., data=Boston)
 
 
-out <- dtree(medv ~., data=Boston)
+out <- dtree(medv ~., data=Boston,methods=c("lm","rpart","rf"))
 
 summary(out)
 

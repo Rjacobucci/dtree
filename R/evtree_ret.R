@@ -6,7 +6,7 @@ ret <- list()
 return.matrix <- matrix(NA,1,8)
 colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
 
-evtree.out <- try(evtree(formula,data.train),silent=TRUE)
+evtree.out <- try(evtree::evtree(formula,data.train),silent=TRUE)
 
 if(inherits(evtree.out, "try-error")){
   return.matrix <- NA

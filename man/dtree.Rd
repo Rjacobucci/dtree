@@ -25,4 +25,12 @@ is allocated to test dataset.}
 \description{
 Main function for creating different types of decision trees
 }
+\examples{
+library(MASS) # for boston data
+data(Boston)
+out <- dtree(medv ~., data=Boston,methods=c("lm","rpart","ctree"))
+summary(out)
+plot(out$rpart.out)
+
+}
 

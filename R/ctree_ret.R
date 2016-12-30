@@ -6,7 +6,7 @@ ret <- list()
 return.matrix <- matrix(NA,1,8)
 colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
 
-ctree.out <- ctree(formula,data.train)
+ctree.out <- party::ctree(formula,data.train)
 
 
 #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
@@ -28,7 +28,7 @@ var.name <- rep(NA,length(node.try))
 
 if(length(var.name) > 0){
   for(i in 1:length(var.name)){
-    var.name[i] <- nodes(ctree.out,node.try[i])[[1]]$psplit$variableName
+    var.name[i] <- party::nodes(ctree.out,node.try[i])[[1]]$psplit$variableName
   }
 }
 

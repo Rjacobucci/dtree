@@ -9,7 +9,20 @@
 #'        is allocated to test dataset.
 #' @param prune Whether to prune rpart tree
 #'
+#'
+#' @importFrom stats cor fitted lm predict terms
+#' @import party rpart evtree caret
 #' @export
+#'
+#' @examples
+#' # continuous outcome
+#' library(MASS) # for boston data
+#' data(Boston)
+#' out <- dtree(medv ~., data=Boston,methods=c("lm","rpart","ctree"))
+#' summary(out)
+#' plot(out$rpart.out)
+#'
+#' # categorical outcome
 #'
 
 

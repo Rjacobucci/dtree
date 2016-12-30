@@ -6,13 +6,13 @@ ret <- list()
 return.matrix <- matrix(NA,1,6)
 colnames(return.matrix) <- c("nodes","nvar","nsplits","fit.cv","fit.train","fit.test")
 
-tree1 <- tree(formula,data.train)
-cv1 <- cv.tree(tree1)
+tree1 <- tree::tree(formula,data.train)
+cv1 <- tree::cv.tree(tree1)
 
 min.loc <- which(min(cv1$dev) == cv1$dev)
 return.matrix[1,"nodes"] <- cv1$size[min.loc]
 
-pruned.tree <- prune.tree(tree1,cv1$k[min.loc])
+pruned.tree <- tree::prune.tree(tree1,cv1$k[min.loc])
 
 #return.matrix[1,"nsplits"] <- cp[min.error,"nsplit"]
 return.matrix[1,"fit.cv"] <- cv1$dev[min.loc]/nrow(data.train)

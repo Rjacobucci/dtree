@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: regsem\nType: Package\nTitle: Performs Reglarization on Structural Equation Models\nVersion: 0.5.2\nAuthor: Ross Jacobucci[aut,cre], Kevin J. Grimm [ctb]\nMaintainer: Ross Jacobucci <rcjacobuc@gmail.com>\nDescription: Uses both ridge and lasso penalties (and extensions) to penalize\n    specific parameters in structural equation models. The package offers additional\n    cost functions, cross validation, and other extensions beyond traditional SEM.\nLicense: GPL (>= 2)\nLazyData: TRUE\nDepends:\n    lavaan,\n    Rcpp\nSuggests:\n    snowfall,\n    GA,\n    rgenoud,\n    Rsolnp,\n    numDeriv,\n    optimx,\n    semPlot\nLinkingTo: Rcpp,\n    RcppArmadillo\nRoxygenNote: 5.0.1\n",
+    "created" : 1483112701133.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3977889612",
+    "id" : "955CBAFF",
+    "lastKnownWriteTime" : 1483106996,
+    "last_content_update" : 1483106996,
+    "path" : "~/GitHub/regsem/DESCRIPTION",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}

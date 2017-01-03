@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(evtree)\n\nlibrary(MASS);library(rpart)\ndata(Boston)\nrpart.Boston <- rpart(medv ~., data=Boston)\n#summary(rpart.Boston)\nplot(rpart.Boston);text(rpart.Boston)\n\n\nev.out <- evtree(medv ~., data=Boston)\nplot(ev.out)\n\nmat <- matrix(NA,506,100)\nmod.mat <- rep(NA,100)\nfor(i in 1:100){\n  set.seed(i)\n  rpart.Boston <- rpart(medv ~., data=Boston)\n  val <- min(rpart.Boston$cptable[,\"xerror\"])\n  ind <- which(rpart.Boston$cptable[,\"xerror\"] == val)[1]\n  mod.mat[i] <- rpart.Boston$cptable[ind,\"nsplit\"]\n  mat[,i] <- predict(rpart.Boston)\n}\n\n\n\nmat <- matrix(NA,506,100)\nmod.mat <- rep(NA,100)\nfor(i in 1:100){\n  set.seed(i)\n  \n  ids <- sample(1:nrow(Boston),nrow(Boston),replace=TRUE)\n  data <- Boston[ids,]\n  \n  rpart.Boston <- rpart(medv ~., data=data)\n  val <- min(rpart.Boston$cptable[,\"xerror\"])\n  ind <- which(rpart.Boston$cptable[,\"xerror\"] == val)[1]\n  mod.mat[i] <- rpart.Boston$cptable[ind,\"nsplit\"]\n  mat[,i] <- predict(rpart.Boston)\n}\n\n\n\n\n\nlibrary(tree)\n\nBoston2 <- Boston[1:50,]\n\nmat <- matrix(NA,50,100)\nmod.mat <- rep(NA,100)\nfor(i in 1:100){\n  set.seed(i)\n  \n  ids <- sample(1:nrow(Boston2),nrow(Boston2),replace=TRUE)\n  data <- Boston2[ids,]\n  \n  tree.Boston <- tree(medv ~., data=data)\n  mod.mat[i] <- summary(tree.Boston)$size\n  mat[ids,i] <- predict(tree.Boston)\n}\n\nlibrary(psych)\ncorFiml(mat)\ncor(mat,use=\"pairwise.complete.obs\")\nmean.pred <- rowMeans(mat,na.rm=T)\n\ntree.Boston <- tree(medv ~., data=Boston)\ncor(mean.pred,predict(tree.Boston))\n\n\n\n\n\nlibrary(ISLR)\ndata(Caravan)\nlibrary(tree)\n\nmat <- matrix(NA,nrow(Caravan),100)\nmod.mat <- rep(NA,100)\nfor(i in 1:100){\n  set.seed(i)\n  \n  ids <- sample(1:nrow(Caravan),nrow(Caravan),replace=TRUE)\n  data <- Caravan[ids,]\n  \n  tree.Caravan <- tree(MOSTYPE ~., data=data,control=tree.control(nobs=nrow(Caravan),mindev=0.001))\n  mod.mat[i] <- summary(tree.Caravan)$size\n  mat[ids,i] <- predict(tree.Caravan)\n}\n\nlibrary(psych)\n#corFiml(mat)\ncor(mat,use=\"pairwise.complete.obs\");mod.mat\nmean.pred <- rowMeans(mat,na.rm=T)\n\ntree.Caravan <- tree(medv ~., data=Caravan)\ncor(mean.pred,predict(tree.Caravan))\n",
+    "created" : 1483454875653.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2302714155",
+    "id" : "1B1F2516",
+    "lastKnownWriteTime" : 1482169332,
+    "last_content_update" : 1482169332,
+    "path" : "~/GitHub/diss_paper/analyses/DT_variability_sim.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

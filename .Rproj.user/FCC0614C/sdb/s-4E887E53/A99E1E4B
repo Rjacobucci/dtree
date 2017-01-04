@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(ISLR)\ndata(Default)\n\n\nlr.out <- glm(default~.,family=\"binomial\",data=Default)\nsummary(lr.out)\n\nround(predict(lr.out,type=\"response\"))\n\nmean(round(predict(lr.out,type=\"response\"))+1 == as.numeric(Default$default))\n\n\nout <- dtree(default ~ ., data=Default,methods=c(\"lm\",\"rpart\"))\nsummary(out)\n\n\nout2 <- rpart(default ~ ., data=Default)\nout2\n\n\nevtree.out <- evtree::evtree(default ~ ., data=Default)\n\n\n\nlibrary(MASS) # for boston data\ndata(Boston)\nout <- dtree(medv ~., data=Boston,methods=c(\"lm\",\"rpart\",\"ctree\"))\n#' summary(out)\n#' plot(out$rpart.out)\n",
+    "created" : 1483484963113.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3902596912",
+    "id" : "A99E1E4B",
+    "lastKnownWriteTime" : 1483489777,
+    "last_content_update" : 1483489777510,
+    "path" : "~/GitHub/dtree/class_ex.R",
+    "project_path" : "class_ex.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

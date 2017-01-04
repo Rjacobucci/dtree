@@ -5,7 +5,7 @@
 \title{Main function for creating different types of decision trees}
 \usage{
 dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
-  weights, perc.sub = 0.5, prune = TRUE)
+  weights, perc.sub = 0.75, prune = TRUE)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
@@ -18,7 +18,7 @@ lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests}
 \item{weights}{Optional weights for each case.}
 
 \item{perc.sub}{What fraction of data to put into train dataset. 1-frac.sub
-is allocated to test dataset.}
+is allocated to test dataset. Defaults to 0.75}
 
 \item{prune}{Whether to prune rpart tree}
 }
@@ -26,11 +26,18 @@ is allocated to test dataset.}
 Main function for creating different types of decision trees
 }
 \examples{
+# continuous outcome
 library(MASS) # for boston data
 data(Boston)
 out <- dtree(medv ~., data=Boston,methods=c("lm","rpart","ctree"))
 summary(out)
 plot(out$rpart.out)
 
+# categorical outcome
+library(ISLR)
+data(Default)
+
+out <- dtree(default ~ ., data=Default,methods=c("lm","rpart"))
+summary(out)
 }
 

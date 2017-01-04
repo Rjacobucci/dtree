@@ -6,11 +6,11 @@
 #'        lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests
 #' @param weights Optional weights for each case.
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
-#'        is allocated to test dataset.
+#'        is allocated to test dataset. Defaults to 0.75
 #' @param prune Whether to prune rpart tree
 #'
 #'
-#' @importFrom stats cor fitted lm predict terms
+#' @importFrom stats cor fitted lm predict terms glm binomial
 #' @import party rpart evtree caret
 #' @export
 #'
@@ -23,22 +23,21 @@
 #' plot(out$rpart.out)
 #'
 #' # categorical outcome
+#' library(ISLR)
+#' data(Default)
 #'
+#' out <- dtree(default ~ ., data=Default,methods=c("lm","rpart"))
+#' summary(out)
 
 
 dtree = function(formula,
                  data,
                  methods=c("lm","rpart","tree","ctree","evtree"),
                  weights,
-                 perc.sub=.5,
+                 perc.sub=.75,
                  prune=TRUE){
 
   ret <- list()
-
-  return.matrix <- matrix(NA,length(methods),8)
-  rownames(return.matrix) <- methods
-  colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
-
 
   ids <- sample(nrow(data),nrow(data)*perc.sub)
   data.train <- data[ids,]
@@ -46,7 +45,6 @@ dtree = function(formula,
 
 
 
-  # parse out the response variable name
   getResponseFormula <- function (object)
   {
     form <- formula(object)
@@ -61,6 +59,19 @@ dtree = function(formula,
 
 
   class.response <- class(data.train[,response])
+
+
+  if(class.response == "numeric" | class.response == "integer"){
+    return.matrix <- matrix(NA,length(methods),8)
+    rownames(return.matrix) <- methods
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv",
+                                 "misfit.train","rsq.train","misfit.test","rsq.test")
+  }else{
+    return.matrix <- matrix(NA,length(methods),6)
+    rownames(return.matrix) <- methods
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.cv",
+                                 "accuracy.train","accuracy.test")
+  }
 
 
   # -----------------------------------------------------------------

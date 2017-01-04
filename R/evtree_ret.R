@@ -3,9 +3,15 @@ evtree_ret <- function(formula, data.train, data.test,class.response, response){
 
 ret <- list()
 
-return.matrix <- matrix(NA,1,8)
-colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
-
+if(class.response == "numeric" | class.response == "integer"){
+  return.matrix <- matrix(NA,1,8)
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv",
+                               "misfit.train","rsq.train","misfit.test","rsq.test")
+}else{
+  return.matrix <- matrix(NA,1,6)
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.cv",
+                               "accuracy.train","accuracy.test")
+}
 evtree.out <- try(evtree::evtree(formula,data.train),silent=TRUE)
 
 if(inherits(evtree.out, "try-error")){
@@ -55,12 +61,12 @@ if(class.response == "numeric" | class.response == "integer"){
 
   return.matrix[1,"misfit.train"] <- mean((data.train[,response] - predict(evtree.out))^2)/nrow(data.train)
   return.matrix[1,"misfit.test"] <- mean((data.test[,response] -
-                                         predict(evtree.out,data.test))^2)/nrow(data.test)
+                                            predict(evtree.out,data.test))^2)/nrow(data.test)
   return.matrix[1,"rsq.train"] <- (cor(data.train[,response],predict(evtree.out)))**2
   return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(evtree.out,data.test)))**2
 }else{
-  return.matrix[1,"misfit.train"] <- NA
-  return.matrix[1,"misfit.test"] <- NA
+  return.matrix[1,"accuracy.train"] <- mean(as.numeric(predict(evtree.out)) == as.numeric(data.train[,response]))
+  return.matrix[1,"accuracy.test"] <- mean(as.numeric(predict(evtree.out,data.test)) == as.numeric(data.test[,response]))
 }
 
 }

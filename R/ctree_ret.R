@@ -50,8 +50,8 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(ctree.out)))**2)
   return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(ctree.out,data.test)))**2)
 }else{
-  return.matrix[1,"misfit.train"] <- NA
-  return.matrix[1,"misfit.test"] <- NA
+  return.matrix[1,"accuracy.train"] <- NA
+  return.matrix[1,"accuracy.test"] <- NA
 }
 
 

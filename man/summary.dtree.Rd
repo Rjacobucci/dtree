@@ -4,7 +4,7 @@
 \alias{summary.dtree}
 \title{Summary results from dtree.}
 \usage{
-summary.dtree(object, ...)
+\method{summary}{dtree}(object, ...)
 }
 \arguments{
 \item{object}{An object from dtree.}

@@ -19,4 +19,5 @@ Depends: rpart,
          caret
 Suggests: randomForest,
           tree,
-          MASS
+          MASS,
+          ISLR

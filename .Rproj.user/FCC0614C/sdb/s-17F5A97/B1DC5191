@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\nrf_ret <- function(formula, data.train, data.test,class.response, response){\n  ret <- list()\n\n  if(class.response == \"numeric\" | class.response == \"integer\"){\n    return.matrix <- matrix(NA,1,8)\n    colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"misfit.cv\",\n                                 \"misfit.train\",\"rsq.train\",\"misfit.test\",\"rsq.test\")\n  }else{\n    return.matrix <- matrix(NA,1,6)\n    colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"accuracy.cv\",\n                                 \"accuracy.train\",\"accuracy.test\")\n  }\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n  rf.out <- train(formula,data.train,method=\"rf\",\n                  trControl=trainControl(method=\"cv\"),importance=TRUE)\n}else{\n  rf.out <- train(formula,data.train,method=\"rf\",metric=\"Accuracy\",\n                  trControl=trainControl(method=\"cv\"),importance=TRUE)\n}\n\n\n\n\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  return.matrix[1,\"misfit.train\"] <- suppressWarnings(mean((data.train[,response] - predict(rf.out))^2)/nrow(data.train))\n  return.matrix[1,\"misfit.test\"] <- suppressWarnings(mean((data.test[,response] -\n                                            predict(rf.out,data.test))^2)/nrow(data.test))\n  return.matrix[1,\"misfit.cv\"] <- min(rf.out$results$RMSE)/(.75*nrow(data.train))\n  return.matrix[1,\"rsq.train\"] <- suppressWarnings((cor(data.train[,response],predict(rf.out)))**2)\n  return.matrix[1,\"rsq.test\"] <- suppressWarnings((cor(data.test[,response],predict(rf.out,data.test)))**2)\n}else{\n  return.matrix[1,\"accuracy.cv\"] <- max(rf.out$results$Accuracy)\n  return.matrix[1,\"accuracy.train\"] <- mean(predict(rf.out) == data.train[,response])\n  return.matrix[1,\"accuracy.test\"] <- mean(predict(rf.out,data.test) == data.test[,response])\n}\n\n\nret$vec <- return.matrix\nret$rf.ret <- rf.out\nreturn(ret)\n\n}\n",
+    "created" : 1483730088557.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3239807571",
+    "id" : "B1DC5191",
+    "lastKnownWriteTime" : 1483733510,
+    "last_content_update" : 1483733510596,
+    "path" : "~/GitHub/dtree/R/rf_ret.R",
+    "project_path" : "R/rf_ret.R",
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

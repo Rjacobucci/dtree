@@ -35,9 +35,9 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(rf.out)))**2)
   return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(rf.out,data.test)))**2)
 }else{
-  #return.matrix[1,"accuracy.cv"] <- cp[min.error,"xerror"]
-  return.matrix[1,"accuracy.train"] <- mean(round(predict(rf.out)[,2])+1 == as.numeric(data.train[,response]))
-  return.matrix[1,"accuracy.test"] <- mean(round(predict(rf.out,data.test)[,2])+1 == as.numeric(data.test[,response]))
+  return.matrix[1,"accuracy.cv"] <- max(rf.out$results$Accuracy)
+  return.matrix[1,"accuracy.train"] <- mean(predict(rf.out) == data.train[,response])
+  return.matrix[1,"accuracy.test"] <- mean(predict(rf.out,data.test) == data.test[,response])
 }
 
 

@@ -11,7 +11,7 @@ round(predict(lr.out,type="response"))
 mean(round(predict(lr.out,type="response"))+1 == as.numeric(Default$default))
 
 
-out <- dtree(default ~ ., data=Default,methods=c("lm","rpart","tree","rf"))
+out <- dtree(default ~ ., data=Default,methods=c("lm","rpart","tree","rf","evtree","ctree"))
 summary(out)
 
 

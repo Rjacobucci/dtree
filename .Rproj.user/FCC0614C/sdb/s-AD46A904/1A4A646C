@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\nctree_ret <- function(formula, data.train, data.test,class.response, response){\n\nret <- list()\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n  return.matrix <- matrix(NA,1,8)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"misfit.cv\",\n                               \"misfit.train\",\"rsq.train\",\"misfit.test\",\"rsq.test\")\n}else{\n  return.matrix <- matrix(NA,1,6)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"accuracy.cv\",\n                               \"accuracy.train\",\"accuracy.test\")\n}\nctree.out <- party::ctree(formula,data.train)\n\n\n#min.error <- which(min(cp[,\"xerror\"]) == cp[,\"xerror\"])[1]\n\nnodes <- ctree.out@get_where()\nreturn.matrix[1,\"nsplits\"] <- max(nodes) - length(unique(nodes))\n#return.matrix[1,\"fit.cv\"] <- cp[min.error,\"xerror\"]\n\npreds <- predict(ctree.out)\n\n\n\n#depth(ctree.out$node)\n\n\nnode.try <- subset(1:max(nodes), !(1:max(nodes) %in% unique(nodes)))\n\nvar.name <- rep(NA,length(node.try))\n\nif(length(var.name) > 0){\n  for(i in 1:length(var.name)){\n    var.name[i] <- party::nodes(ctree.out,node.try[i])[[1]]$psplit$variableName\n  }\n}\n\n\n\n\n\nreturn.matrix[1,\"nvar\"] <- length(unique(var.name))\n\nreturn.matrix[1,\"nodes\"] <- length(unique(nodes))\n\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  return.matrix[1,\"misfit.train\"] <- suppressWarnings(mean((data.train[,response] - predict(ctree.out))^2)/nrow(data.train))\n  return.matrix[1,\"misfit.test\"] <- suppressWarnings(mean((data.test[,response] -\n                                            predict(ctree.out,data.test))^2)/nrow(data.test))\n  return.matrix[1,\"rsq.train\"] <- suppressWarnings((cor(data.train[,response],predict(ctree.out)))**2)\n  return.matrix[1,\"rsq.test\"] <- suppressWarnings((cor(data.test[,response],predict(ctree.out,data.test)))**2)\n}else{\n  return.matrix[1,\"accuracy.train\"] <- mean(as.numeric(predict(ctree.out)) == as.numeric(data.train[,response]))\n  return.matrix[1,\"accuracy.test\"] <- mean(as.numeric(predict(ctree.out,data.test)) == as.numeric(data.test[,response]))\n}\n\n\nret$vec <- return.matrix\nret$ctree.ret <- ctree.out\nreturn(ret)\n\n}\n",
+    "created" : 1483485652051.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1437863499",
+    "id" : "1A4A646C",
+    "lastKnownWriteTime" : 1483727606,
+    "last_content_update" : 1483727606559,
+    "path" : "~/GitHub/dtree/R/ctree_ret.R",
+    "project_path" : "R/ctree_ret.R",
+    "properties" : {
+    },
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

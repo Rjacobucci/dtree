@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\nlm_ret <- function(formula, data.train, data.test,class.response, response){\n\nret <- list()\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n  return.matrix <- matrix(NA,1,8)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"misfit.cv\",\n                               \"misfit.train\",\"rsq.train\",\"misfit.test\",\"rsq.test\")\n}else{\n  return.matrix <- matrix(NA,1,6)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"accuracy.cv\",\n                               \"accuracy.train\",\"accuracy.test\")\n}\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  lm.out <- lm(formula,data.train)\n  p_s <- summary(lm.out)$coefficients[,\"Pr(>|t|)\"] < 0.05\n  return.matrix[1,\"nvar\"] <- sum(p_s[-1])\n}else{\n  lm.out <- glm(formula,family=binomial,data.train)\n  return.matrix[1,\"nvar\"] <- sum(summary(lm.out)$coefficients[,\"Pr(>|z|)\"][-1] < .05)\n}\n\n\n\n#preds <- predict(lm.out)\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  return.matrix[1,\"misfit.train\"] <- suppressWarnings(mean((data.train[,response] - predict(lm.out))^2)/nrow(data.train))\n  return.matrix[1,\"misfit.test\"] <- suppressWarnings(mean((data.test[,response] -\n                                            predict(lm.out,data.test))^2)/nrow(data.test))\n  return.matrix[1,\"rsq.train\"] <- suppressWarnings((cor(data.train[,response],predict(lm.out)))**2)\n  return.matrix[1,\"rsq.test\"] <- suppressWarnings((cor(data.test[,response],predict(lm.out,data.test)))**2)\n}else{\n  return.matrix[1,\"accuracy.train\"] <- mean(round(predict(lm.out,type=\"response\"))+1 == as.numeric(data.train[,response]))\n  return.matrix[1,\"accuracy.test\"] <- mean(round(predict(lm.out,data.test,type=\"response\"))+1 == as.numeric(data.test[,response]))\n}\n\n\nret$vec <- return.matrix\nret$lm.ret <- lm.out\nreturn(ret)\n\n}\n",
+    "created" : 1483485379788.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3677175895",
+    "id" : "CD3DA118",
+    "lastKnownWriteTime" : 1483727341,
+    "last_content_update" : 1483727341689,
+    "path" : "~/GitHub/dtree/R/lm_ret.R",
+    "project_path" : "R/lm_ret.R",
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

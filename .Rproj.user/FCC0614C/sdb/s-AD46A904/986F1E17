@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\ntree_ret <- function(formula, data.train, data.test, prune, class.response, response){\n\n  ret <- list()\n\n  if(class.response == \"numeric\" | class.response == \"integer\"){\n    return.matrix <- matrix(NA,1,8)\n    colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"misfit.cv\",\n                                 \"misfit.train\",\"rsq.train\",\"misfit.test\",\"rsq.test\")\n  }else{\n    return.matrix <- matrix(NA,1,6)\n    colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"accuracy.cv\",\n                                 \"accuracy.train\",\"accuracy.test\")\n  }\n\ntree1 <- tree::tree(formula,data.train)\ncv1 <- tree::cv.tree(tree1)\n\nmin.loc <- which(min(cv1$dev) == cv1$dev)\nreturn.matrix[1,\"nodes\"] <- cv1$size[min.loc]\n\npruned.tree <- tree::prune.tree(tree1,best=cv1$size[min.loc])\n\nreturn.matrix[1,\"nodes\"] <- cv1$size[min.loc]\n\n#return.matrix[1,\"nsplits\"] <- cp[min.error,\"nsplit\"]\n#return.matrix[1,\"fit.cv\"] <- cv1$dev[min.loc]/nrow(data.train)\n#return.matrix[1,\"fit.train\"] <- cp[min.error,\"rel error\"]\n\n#if(prune == TRUE){\n#  rpart.ret <- prune.rpart(rpart.out,cp[min.error,\"CP\"])\n#}else{\n#  rpart.ret <- rpart.out\n#}\n\nuniq <- unique(pruned.tree$frame[,\"var\"])\nreturn.matrix[1,\"nvar\"] <- length(uniq[uniq != \"<leaf>\"])\n\nreturn.matrix[1,\"nsplits\"] <- length(pruned.tree$frame[,\"var\"]) - cv1$size[min.loc]\n#vars <- rpart.ret$frame[,\"var\"]\n#vars2 <- vars[vars != \"<leaf>\"]\n#return.matrix[1,\"nvar\"] <- length(unique(vars2))\n\n\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  #return.matrix[1,\"misfit.cv\"] <- cp[min.error,\"xerror\"]\n  return.matrix[1,\"misfit.train\"] <- mean((data.train[,response] - predict(pruned.tree))^2)/nrow(data.train)\n  return.matrix[1,\"misfit.test\"] <- mean((data.test[,response] -\n                                            predict(pruned.tree,data.test))^2)/nrow(data.test)\n  return.matrix[1,\"rsq.train\"] <- (cor(data.train[,response],predict(pruned.tree)))**2\n  return.matrix[1,\"rsq.test\"] <- (cor(data.test[,response],predict(pruned.tree,data.test)))**2\n}else{\n  #return.matrix[1,\"accuracy.cv\"] <- cp[min.error,\"xerror\"]\n  return.matrix[1,\"accuracy.train\"] <- mean(round(predict(pruned.tree)[,2])+1 == as.numeric(data.train[,response]))\n  return.matrix[1,\"accuracy.test\"] <- mean(round(predict(pruned.tree ,data.test)[,2])+1 == as.numeric(data.test[,response]))\n}\n\n\nret$vec <- return.matrix\nret$tree.ret <- pruned.tree\nreturn(ret)\n\n}\n",
+    "created" : 1483728247830.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4218571823",
+    "id" : "986F1E17",
+    "lastKnownWriteTime" : 1483729957,
+    "last_content_update" : 1483729957830,
+    "path" : "~/GitHub/dtree/R/tree_ret.R",
+    "project_path" : "R/tree_ret.R",
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

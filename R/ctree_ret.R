@@ -3,9 +3,15 @@ ctree_ret <- function(formula, data.train, data.test,class.response, response){
 
 ret <- list()
 
-return.matrix <- matrix(NA,1,8)
-colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
-
+if(class.response == "numeric" | class.response == "integer"){
+  return.matrix <- matrix(NA,1,8)
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv",
+                               "misfit.train","rsq.train","misfit.test","rsq.test")
+}else{
+  return.matrix <- matrix(NA,1,6)
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.cv",
+                               "accuracy.train","accuracy.test")
+}
 ctree.out <- party::ctree(formula,data.train)
 
 
@@ -50,8 +56,8 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(ctree.out)))**2)
   return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(ctree.out,data.test)))**2)
 }else{
-  return.matrix[1,"accuracy.train"] <- NA
-  return.matrix[1,"accuracy.test"] <- NA
+  return.matrix[1,"accuracy.train"] <- mean(as.numeric(predict(ctree.out)) == as.numeric(data.train[,response]))
+  return.matrix[1,"accuracy.test"] <- mean(as.numeric(predict(ctree.out,data.test)) == as.numeric(data.test[,response]))
 }
 
 

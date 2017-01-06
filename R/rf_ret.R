@@ -1,10 +1,16 @@
 
 rf_ret <- function(formula, data.train, data.test,class.response, response){
+  ret <- list()
 
-ret <- list()
-
-return.matrix <- matrix(NA,1,8)
-colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv","misfit.train","rsq.train","misfit.test","rsq.test")
+  if(class.response == "numeric" | class.response == "integer"){
+    return.matrix <- matrix(NA,1,8)
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv",
+                                 "misfit.train","rsq.train","misfit.test","rsq.test")
+  }else{
+    return.matrix <- matrix(NA,1,6)
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.cv",
+                                 "accuracy.train","accuracy.test")
+  }
 
 
 if(class.response == "numeric" | class.response == "integer"){
@@ -17,7 +23,7 @@ if(class.response == "numeric" | class.response == "integer"){
 
 
 
-preds <- predict(rf.out)
+
 
 
 if(class.response == "numeric" | class.response == "integer"){
@@ -29,8 +35,9 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(rf.out)))**2)
   return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(rf.out,data.test)))**2)
 }else{
-  return.matrix[1,"accuracy.train"] <- NA
-  return.matrix[1,"accuracy.test"] <- NA
+  #return.matrix[1,"accuracy.cv"] <- cp[min.error,"xerror"]
+  return.matrix[1,"accuracy.train"] <- mean(round(predict(rf.out)[,2])+1 == as.numeric(data.train[,response]))
+  return.matrix[1,"accuracy.test"] <- mean(round(predict(rf.out,data.test)[,2])+1 == as.numeric(data.test[,response]))
 }
 
 

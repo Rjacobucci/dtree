@@ -21,6 +21,7 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"nvar"] <- sum(p_s[-1])
 }else{
   lm.out <- glm(formula,family=binomial,data.train)
+  return.matrix[1,"nvar"] <- sum(summary(lm.out)$coefficients[,"Pr(>|z|)"][-1] < .05)
 }
 
 

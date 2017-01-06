@@ -117,6 +117,9 @@ dtree = function(formula,
 
   if(any(methods == "tree")){
 
+    ret1 <- tree_ret(formula, data.train,data.test, prune, class.response,response)
+    return.matrix["tree",] <- ret1$vec
+    ret$tree.out <- ret1$tree.ret
 
 
 

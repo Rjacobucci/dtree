@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\nsim_regDat <- function(N,P,nonzero.num=NULL,beta.nonzero=NULL){\n  \n  \n  x=data.frame(matrix(rnorm(P*N),ncol=P))\n  \n  if(is.null(nonzero.num)==TRUE){\n    beta <- rep(0,P)\n  }else{\n    beta <- c(beta.nonzero,rep(0,P-nonzero.num))\n  }\n  \n  y <- as.matrix(x)%*%beta + rnorm(nrow(x),0,1)\n  \n  return(data.frame(y,x))\n}\n\ndat <- sim_regDat(500,10,3,c(1,1,1))\n\nlm(y ~ ., dat)\n",
+    "created" : 1484168774371.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2753599733",
+    "id" : "5BE1213",
+    "lastKnownWriteTime" : 1483986875,
+    "last_content_update" : 1483986875,
+    "path" : "~/GitHub/regression_reg_sim/sim_regDat.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

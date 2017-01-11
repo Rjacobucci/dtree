@@ -53,8 +53,19 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix[1,"misfit.train"] <- suppressWarnings(mean((data.train[,response] - predict(ctree.out))^2)/nrow(data.train))
   return.matrix[1,"misfit.test"] <- suppressWarnings(mean((data.test[,response] -
                                             predict(ctree.out,data.test))^2)/nrow(data.test))
-  return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(ctree.out)))**2)
-  return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(ctree.out,data.test)))**2)
+
+  if(sd(predict(ctree.out)) == 0){
+    return.matrix[1,"rsq.train"] <- 0
+  }else{
+    return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(ctree.out)))**2)
+  }
+
+  if(sd(predict(ctree.out,data.test))==0){
+    return.matrix[1,"rsq.test"] <- 0
+  }else{
+    return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(ctree.out,data.test)))**2)
+  }
+
 }else{
   return.matrix[1,"accuracy.train"] <- mean(as.numeric(predict(ctree.out)) == as.numeric(data.train[,response]))
   return.matrix[1,"accuracy.test"] <- mean(as.numeric(predict(ctree.out,data.test)) == as.numeric(data.test[,response]))

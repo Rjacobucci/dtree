@@ -15,6 +15,16 @@ out <- dtree(default ~ ., data=Default,methods=c("lm","rpart","tree","rf","evtre
 summary(out)
 
 
+ret <- stability(default ~ ., data=Default,methods=c("lm","rpart","ctree","evtree"))
+ret
+
+rett <- unlist(ret)
+results <- matrix(rett,100,18,byrow=FALSE)
+
+
+
+
+
 out2 <- rpart(default ~ ., data=Default)
 out2
 

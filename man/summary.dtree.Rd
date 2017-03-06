@@ -14,4 +14,3 @@
 \description{
 Summary results from dtree.
 }
-

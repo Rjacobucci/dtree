@@ -10,7 +10,6 @@
 #'        is allocated to test dataset. Defaults to 0.75
 #' @param prune Whether to prune rpart tree
 #'
-#' @importFrom matrixStats colVars
 #'
 #'
 #' @export

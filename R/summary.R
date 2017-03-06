@@ -2,6 +2,7 @@
 #'
 #' @param object An object from dtree.
 #' @param ... Other arguments.
+#' @method summary dtree
 #' @export
 
 

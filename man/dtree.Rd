@@ -40,4 +40,3 @@ data(Default)
 out <- dtree(default ~ ., data=Default,methods=c("lm","rpart"))
 summary(out)
 }
-

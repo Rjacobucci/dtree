@@ -27,4 +27,3 @@ is allocated to test dataset. Defaults to 0.75}
 \description{
 Main function to calculate stability coefficients
 }
-

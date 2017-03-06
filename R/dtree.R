@@ -10,7 +10,7 @@
 #' @param prune Whether to prune rpart tree
 #'
 #'
-#' @importFrom stats cor fitted lm predict terms glm binomial
+#' @importFrom stats cor fitted lm predict terms glm binomial sd
 #' @import party rpart evtree caret
 #' @export
 #'

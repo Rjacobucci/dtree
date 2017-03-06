@@ -16,7 +16,8 @@ RoxygenNote: 6.0.1
 Depends: rpart,
          party,
          evtree,
-         caret
+         caret,
+         stablelearner
 Suggests: randomForest,
           tree,
           MASS,

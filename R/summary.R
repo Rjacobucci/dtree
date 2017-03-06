@@ -12,7 +12,9 @@ summary.dtree <- function(object,...){
               response.type = object$response.type,
               call = object$call)
 
-
+  if(object$subset==FALSE){
+    warning("Train and Test performance is equal because of no subsetting")
+  }
 
   class(ret) <- "summary.dtree"
   print(ret)

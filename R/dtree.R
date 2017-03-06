@@ -4,14 +4,15 @@
 #' @param data Data frame to run models on
 #' @param methods Which tree methods to use. Defaults:
 #'        lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests
-#' @param weights Optional weights for each case.
+#' @param subset Whether to split dataset into training and test sets
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset. Defaults to 0.75
 #' @param prune Whether to prune rpart tree
+#' @param weights Optional weights for each case.
 #'
 #'
 #' @importFrom stats cor fitted lm predict terms glm binomial sd
-#' @import party rpart evtree caret
+#' @import party rpart evtree caret stablelearner
 #' @export
 #'
 #' @examples
@@ -33,15 +34,22 @@
 dtree = function(formula,
                  data,
                  methods=c("lm","rpart","tree","ctree","evtree"),
-                 weights,
+                 subset=FALSE,
                  perc.sub=.75,
-                 prune=TRUE){
+                 prune=TRUE,
+                 weights){
 
   ret <- list()
 
-  ids <- sample(nrow(data),nrow(data)*perc.sub)
-  data.train <- data[ids,]
-  data.test <- data[-ids,]
+  if(subset==TRUE){
+    ids <- sample(nrow(data),nrow(data)*perc.sub)
+    data.train <- data[ids,]
+    data.test <- data[-ids,]
+  }else{
+    data.train <- data
+    data.test <- data
+  }
+
 
 
 
@@ -167,6 +175,7 @@ dtree = function(formula,
   ret$response.type <- class.response
   ret$return.matrix <- return.matrix
   ret$call <- match.call()
+  ret$subset <- subset
   class(ret) <- "dtree"
   return(ret)
 

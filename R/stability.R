@@ -5,10 +5,11 @@
 #' @param methods Which tree methods to use. Defaults:
 #'        lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests
 #' @param n.rep Number of times to replicate each method
-#' @param weights Optional weights for each case.
+#' @param subset Whether to subset
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset. Defaults to 0.75
 #' @param prune Whether to prune rpart tree
+#' @param weights Optional weights for each case.
 #'
 #'
 #'
@@ -20,13 +21,16 @@ stability = function(formula,
                  data,
                  methods=c("lm","rpart","tree","ctree","evtree"),
                  n.rep=100,
-                 weights,
+                 subset=FALSE,
                  perc.sub=.75,
-                 prune=TRUE){
+                 prune=TRUE,
+                 weights=NULL){
 
   out <- list()
   for(i in 1:n.rep){
-    out[[i]] <- dtree(formula,data,methods,weights,perc.sub,prune)$return.matrix
+    set.seed(i)
+    ids <- sample(nrow(data),nrow(data),replace=TRUE)
+    out[[i]] <- dtree(formula,data[ids,],methods,subset,perc.sub,prune,weights)$return.matrix
   }
 
 
@@ -39,6 +43,9 @@ stability = function(formula,
 
   ret.mean <- apply(ret,3,colMeans,na.rm=TRUE)
   ret.var <- apply(ret,3,matrixStats::colVars,na.rm=TRUE)
+
+  ret.mean <- matrix(ret.mean,length(methods),8)
+  ret.var <- matrix(ret.var,length(methods),8)
 
   row.names(ret.mean) <- methods
   row.names(ret.var) <- methods

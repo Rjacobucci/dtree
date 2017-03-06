@@ -5,7 +5,7 @@
 \title{Main function for creating different types of decision trees}
 \usage{
 dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
-  weights, perc.sub = 0.75, prune = TRUE)
+  subset = FALSE, perc.sub = 0.75, prune = TRUE, weights)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
@@ -15,12 +15,14 @@ dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
 \item{methods}{Which tree methods to use. Defaults:
 lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests}
 
-\item{weights}{Optional weights for each case.}
+\item{subset}{Whether to split dataset into training and test sets}
 
 \item{perc.sub}{What fraction of data to put into train dataset. 1-frac.sub
 is allocated to test dataset. Defaults to 0.75}
 
 \item{prune}{Whether to prune rpart tree}
+
+\item{weights}{Optional weights for each case.}
 }
 \description{
 Main function for creating different types of decision trees

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Summary results from dtree.\n#'\n#' @param object An object from dtree.\n#' @param ... Other arguments.\n#' @method summary dtree\n#' @export\n\n\nsummary.dtree <- function(object,...){\n\n  ret <- list(results = object$return.matrix,\n              response.type = object$response.type,\n              call = object$call)\n\n  if(object$subset==FALSE){\n    warning(\"Train and Test performance is equal because of no subsetting\")\n  }\n\n  class(ret) <- \"summary.dtree\"\n  print(ret)\n}\n",
+    "created" : 1488822153558.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4243387921",
+    "id" : "3EB51813",
+    "lastKnownWriteTime" : 1488825633,
+    "last_content_update" : 1488825633838,
+    "path" : "~/GitHub/dtree/R/summary.R",
+    "project_path" : "R/summary.R",
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

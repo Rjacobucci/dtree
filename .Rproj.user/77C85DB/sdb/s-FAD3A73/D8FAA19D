@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\nrpart_ret <- function(formula, data.train, data.test, prune, class.response, response){\n\nret <- list()\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n  return.matrix <- matrix(NA,1,8)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"misfit.cv\",\n                               \"misfit.train\",\"rsq.train\",\"misfit.test\",\"rsq.test\")\n}else{\n  return.matrix <- matrix(NA,1,6)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"accuracy.cv\",\n                               \"accuracy.train\",\"accuracy.test\")\n}\n\n#rpart.out <- rpart(formula,data.train)\n\nctrl <- trainControl(method=\"repeatedcv\")\ntrain.out <- train(formula,data.train,method=\"rpart\",tuneLength=1,\n                   trControl=ctrl)\nrpart.out <- train.out$finalModel\n\ncp <- rpart.out$cptable\nmin.error <- which(min(cp[,\"rel error\"]) == cp[,\"rel error\"])[1]\nreturn.matrix[1,\"nsplits\"] <- cp[min.error,\"nsplit\"]\ntrain.out$varImp\n\n\nif(prune == TRUE){\n  rpart.ret <- prune.rpart(rpart.out,cp[min.error,\"CP\"])\n}else{\n  rpart.ret <- rpart.out\n}\n\n\nvars <- rpart.ret$frame[,\"var\"]\nvars2 <- vars[vars != \"<leaf>\"]\nreturn.matrix[1,\"nvar\"] <- length(unique(vars2))\n\nreturn.matrix[1,\"nodes\"] <- length(vars[vars == \"<leaf>\"])\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n\n  return.matrix[1,\"misfit.cv\"] <- cp[min.error,\"xerror\"]\n  return.matrix[1,\"misfit.train\"] <- mean((data.train[,response] - predict(rpart.out))^2)/nrow(data.train)\n  return.matrix[1,\"misfit.test\"] <- mean((data.test[,response] -\n                                            predict(rpart.out,data.test))^2)/nrow(data.test)\n  return.matrix[1,\"rsq.train\"] <- (cor(data.train[,response],predict(rpart.out)))**2\n  return.matrix[1,\"rsq.test\"] <- (cor(data.test[,response],predict(rpart.out,data.test)))**2\n}else{\n  return.matrix[1,\"accuracy.cv\"] <- cp[min.error,\"xerror\"]\n  return.matrix[1,\"accuracy.train\"] <- mean(round(predict(rpart.out)[,2])+1 == as.numeric(data.train[,response]))\n  return.matrix[1,\"accuracy.test\"] <- mean(round(predict(rpart.out,data.test)[,2])+1 == as.numeric(data.test[,response]))\n}\n\n\nret$vec <- return.matrix\nret$rpart.ret <- rpart.ret\nreturn(ret)\n\n}\n",
+    "created" : 1488824623070.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "843546926",
+    "id" : "D8FAA19D",
+    "lastKnownWriteTime" : 1488832608,
+    "last_content_update" : 1488832608646,
+    "path" : "~/GitHub/dtree/R/rpart_ret.R",
+    "project_path" : "R/rpart_ret.R",
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -13,13 +13,17 @@ if(class.response == "numeric" | class.response == "integer"){
                                "accuracy.train","accuracy.test")
 }
 
-rpart.out <- rpart(formula,data.train)
+#rpart.out <- rpart(formula,data.train)
 
+ctrl <- trainControl(method="repeatedcv")
+train.out <- train(formula,data.train,method="rpart",tuneLength=1,
+                   trControl=ctrl)
+rpart.out <- train.out$finalModel
 
 cp <- rpart.out$cptable
-min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
+min.error <- which(min(cp[,"rel error"]) == cp[,"rel error"])[1]
 return.matrix[1,"nsplits"] <- cp[min.error,"nsplit"]
-
+train.out$varImp
 
 
 if(prune == TRUE){

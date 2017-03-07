@@ -2,12 +2,11 @@
 
 S3method(summary,dtree)
 export(dtree)
-export(stability)
+export(stable)
 import(caret)
 import(evtree)
 import(party)
 import(rpart)
-import(stablelearner)
 importFrom(stats,binomial)
 importFrom(stats,cor)
 importFrom(stats,fitted)

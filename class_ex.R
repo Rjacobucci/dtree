@@ -34,10 +34,12 @@ out8 <- stablelearner::stabletree(out2)
 evtree.out <- evtree::evtree(default ~ ., data=Default)
 
 
-
+library(stablelearner)
 library(MASS) # for boston data
 data(Boston)
-out <- dtree(medv ~., data=Boston,methods=c("rpart"))
+out <- dtree(medv ~., data=Boston,methods=c("rpart"),tuneLength=10,samp.method="cv")
+stabletree(out$rpart.out)
+
 
 ctrl <- trainControl(method="repeatedcv")
 train.out <- train(medv ~., data=Boston,method="evtree",tuneLength=1,
@@ -50,7 +52,16 @@ varImp(train.out)
 #' plot(out$rpart.out)
 tt <- rpart(medv ~., data=Boston)
 
-(stab.out <- stability(medv ~., data=Boston,methods=c("lm","rpart","ctree"),prune=TRUE,subset=TRUE,perc.sub=.5))
+stab.out <- stable(formula=medv ~.,
+                       data=Boston,
+                       methods=c("rpart"),
+                       samp.method="cv",
+                       tuneLength=2,
+                       n.rep=100,
+                       stablelearner=TRUE,
+                       subset=FALSE,
+                       perc.sub=.75,
+                       weights=NULL)
 
 out99 <- stablelearner::stabletree(train.out$finalModel,B=20)
 summary(out99)

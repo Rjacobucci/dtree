@@ -16,10 +16,10 @@ RoxygenNote: 6.0.1
 Depends: rpart,
          party,
          evtree,
-         caret,
-         stablelearner
+         caret
 Suggests: randomForest,
           tree,
           MASS,
           ISLR,
-          matrixStats
+          matrixStats,
+          stablelearner

@@ -5,7 +5,8 @@
 \title{Main function for creating different types of decision trees}
 \usage{
 dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
-  subset = FALSE, perc.sub = 0.75, prune = TRUE, weights)
+  samp.method = "repeatedcv", tuneLength = 3, subset = FALSE,
+  perc.sub = 0.75, prune = TRUE, weights)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
@@ -14,6 +15,12 @@ dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
 
 \item{methods}{Which tree methods to use. Defaults:
 lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests}
+
+\item{samp.method}{Sampling method. Refer to caret package trainControl()
+documentation. Default is repeated cross-validation. Other options
+include "cv" and "boot".}
+
+\item{tuneLength}{Number of tuning parameters to try. Applies to train()}
 
 \item{subset}{Whether to split dataset into training and test sets}
 
@@ -29,16 +36,16 @@ Main function for creating different types of decision trees
 }
 \examples{
 # continuous outcome
-library(MASS) # for boston data
-data(Boston)
-out <- dtree(medv ~., data=Boston,methods=c("lm","rpart","ctree"))
-summary(out)
-plot(out$rpart.out)
+#library(MASS) # for boston data
+#data(Boston)
+#out <- dtree(medv ~., data=Boston,methods=c("lm","rpart","ctree"))
+#summary(out)
+# plot(out$rpart.out)
 
 # categorical outcome
-library(ISLR)
-data(Default)
+#library(ISLR)
+#data(Default)
 
-out <- dtree(default ~ ., data=Default,methods=c("lm","rpart"))
-summary(out)
+#out <- dtree(default ~ ., data=Default,methods=c("lm","rpart"))
+#summary(out)
 }

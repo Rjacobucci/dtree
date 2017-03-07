@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(MASS);library(rstan)\n# parameters\nlat.mean <- c(0,.5)\nresid <- 1\nprop <- 0\nalpha <- 1\ntimes <- 1:200\n\ndat <- matrix(NA,2000,200)\nR <- matrix(c(1,.1,.1,.02),2,2)\nlats <- mvrnorm(2000, lat.mean, R)# [1] is int, [2] is slope\ndat[,1] <- lats[,1]\n\nfor(i in 2:200){\n  dat[,i] <- dat[,i-1]*prop + lats[,2] + dat[,i-1] + rnorm(nrow(dat))\n}\n\nround(head(dat),3)\n\ndat2 <- matrix(NA,nrow(dat),5)\ntime <- matrix(NA,nrow(dat),5)\nfor(i in 1:nrow(dat)){\n  set.seed(i)\n  time[i,] <- sort(sample(1:200,5))\n  dat2[i,] <- dat[i,time[i,]]\n  \n}\n\n\n\n\n\n\ndat.list <- list(\n  N = nrow(dat2),\n  X = dat2,\n  time = time,\n  t = 5,\n  R=diag(2))\n\n\nlcs.stan <-\"\ndata{\nint N; // sample size\nint t; \nmatrix[2,2] R;\nvector[t] X[N]; // data matrix of order [N,P]\nvector[t] time[N]; // data matrix of order [N,P]\n}\n\nparameters{\nvector[2] FS[N]; // factor scores, matrix of order [N,D]\n\ncholesky_factor_cov[2] Rho; // correlation matrix between factors\nreal sigma; // variance for each variable\nvector[2] M;\n}\n\ntransformed parameters{\nvector[t] mu[N];\nvector[t-1] d[N];\nmatrix[2,2] Sd_d;\nSd_d = multiply_lower_tri_self_transpose(Rho);\n\n\nfor (i in 1:N){\nmu[i,1] = time[i,1]*FS[i,1];\n\nfor (tt in 2:t){\nd[i,tt-1] = FS[i,2]*(time[i,tt]-time[i,tt-1]);\nmu[i,tt] = d[i,tt-1]+mu[i,tt-1];\n}\n}\n}\n\nmodel{\n\n\nfor (i in 1:N){\nFS[i] ~ multi_normal(M, Sd_d);\nX[i,1] ~ normal(mu[i,1],pow(sigma,0.5));\n\n\nfor (tt in 2:t){\nX[i,tt] ~ normal(mu[i,tt], pow(sigma,0.5));\n}\n}\n}\n\"\n\nlcs.out=stan(model_code=lcs.stan,iter=5000,warmup=2000,\n             data = dat.list,chains=1,\n             pars=c(\"sigma\",\"M\",\"Sd_d\"))\n\nlcs.out\n",
+    "created" : 1488924152623.000,
+    "dirty" : false,
+    "encoding" : "ISO8859-1",
+    "folds" : "",
+    "hash" : "681960399",
+    "id" : "4645CD57",
+    "lastKnownWriteTime" : 1488738188,
+    "last_content_update" : 1488738188,
+    "path" : "~/GitHub/LCS_individual/arxiv/simDat3.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

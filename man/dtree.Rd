@@ -14,13 +14,15 @@ dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
 \item{data}{Data frame to run models on}
 
 \item{methods}{Which tree methods to use. Defaults:
-lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests}
+lm, rpart, ctree, evtree. Also can use "rf" for random forests}
 
 \item{samp.method}{Sampling method. Refer to caret package trainControl()
 documentation. Default is repeated cross-validation. Other options
 include "cv" and "boot".}
 
-\item{tuneLength}{Number of tuning parameters to try. Applies to train()}
+\item{tuneLength}{Number of tuning parameters to try. Applies to train().
+Can also be specified as a vector, with order corresponding to the
+order specified in the methods argument.}
 
 \item{subset}{Whether to split dataset into training and test sets}
 

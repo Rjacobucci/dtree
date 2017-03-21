@@ -3,11 +3,13 @@
 #' @param formula a formula, weight a response to left of ~.
 #' @param data Data frame to run models on
 #' @param methods Which tree methods to use. Defaults:
-#'        lm, rpart, tree, ctree, evtree. Also can use "rf" for random forests
+#'        lm, rpart, ctree, evtree. Also can use "rf" for random forests
 #' @param samp.method Sampling method. Refer to caret package trainControl()
 #'        documentation. Default is repeated cross-validation. Other options
 #'        include "cv" and "boot".
-#' @param tuneLength Number of tuning parameters to try. Applies to train()
+#' @param tuneLength Number of tuning parameters to try. Applies to train().
+#'        Can also be specified as a vector, with order corresponding to the
+#'        order specified in the methods argument.
 #' @param subset Whether to split dataset into training and test sets
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset. Defaults to 0.75
@@ -46,6 +48,22 @@ dtree = function(formula,
                  weights){
 
   ret <- list()
+  if(length(tuneLength)==1){
+    tune.rpart <- tune.ctree <- tune.evtree <- tune.rf <- tuneLength
+  }else{
+    if(any(methods=="rpart")){
+      tune.rpart <- tuneLength[methods=="rpart"]
+    }
+    if(any(methods=="ctree")){
+      tune.ctree <- tuneLength[methods=="ctree"]
+    }
+    if(any(methods=="evtree")){
+      tune.evtree <- tuneLength[methods=="evtree"]
+    }
+    if(any(methods=="rf")){
+      tune.rf <- tuneLength[methods=="rf"]
+    }
+  }
 
   if(subset==TRUE){
     ids <- sample(nrow(data),nrow(data)*perc.sub)
@@ -112,27 +130,11 @@ dtree = function(formula,
 
 
   if(any(methods=="rpart")){
-
-  ret1 <- rpart_ret(formula, data.train,data.test,samp.method,tuneLength,subset, class.response,response)
+    cat("Currently running",tune.rpart, "rpart models\n")
+  ret1 <- rpart_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response)
   return.matrix["rpart",] <- ret1$vec
   ret$rpart.out <- ret1$rpart.ret
   ret$rpart.train <- ret1$rpart.train
-
-
-
-  }
-
-  # --------------------------------------------------
-
-  # Tree
-
-  # --------------------------------------------------
-
-  if(any(methods == "tree")){
-
-    ret1 <- tree_ret(formula, data.train,data.test, prune, class.response,response)
-    return.matrix["tree",] <- ret1$vec
-    ret$tree.out <- ret1$tree.ret
 
 
 
@@ -143,11 +145,12 @@ dtree = function(formula,
   # Ctree
 
   # ----------------------------------------------------
-
   if(any(methods == "ctree")){
-    ret3 <- ctree_ret(formula, data.train,data.test, class.response,response)
+    cat("Currently running",tune.ctree, "ctree models\n")
+    ret3 <- ctree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.ctree,subset, class.response,response)
     return.matrix["ctree",] <- ret3$vec
     ret$ctree.out <- ret3$ctree.ret
+    ret$ctree.train <- ret3$ctree.train
   }
 
 
@@ -158,9 +161,11 @@ dtree = function(formula,
   # ---------------------------------------------------
 
   if(any(methods == "evtree")){
-    ret4 <- evtree_ret(formula, data.train,data.test, class.response,response)
+    cat("Currently running",tune.evtree, "evtree models\n")
+    ret4 <- evtree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.evtree,subset, class.response,response)
     return.matrix["evtree",] <- ret4$vec
     ret$evtree.out <- ret4$evtree.ret
+    ret$evtree.train <- ret4$evtree.train
   }
 
   #----------------------------------------------------
@@ -170,9 +175,11 @@ dtree = function(formula,
   # ---------------------------------------------------
 
   if(any(methods == "rf")){
-    ret5 <- rf_ret(formula, data.train,data.test, class.response,response)
+    cat("Currently running",tune.rf, "random forest models\n")
+    ret5 <- rf_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rf,subset, class.response,response)
     return.matrix["rf",] <- ret5$vec
     ret$rf.out <- ret5$rf.ret
+    ret$rf.train <- ret5$rf.train
   }
 
 

@@ -1,18 +1,21 @@
 
-ctree_ret <- function(formula, data.train, data.test,class.response, response){
+ctree_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,class.response, response){
 
 ret <- list()
 
 if(class.response == "numeric" | class.response == "integer"){
-  return.matrix <- matrix(NA,1,8)
-  colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv",
-                               "misfit.train","rsq.train","misfit.test","rsq.test")
+  return.matrix <- matrix(NA,1,7)
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","rmse.samp",
+                               "rsq.samp","rmse.test","rsq.test")
 }else{
-  return.matrix <- matrix(NA,1,6)
-  colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.cv",
-                               "accuracy.train","accuracy.test")
+  return.matrix <- matrix(NA,1,5)
+  colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.samp",
+                               "accuracy.test")
 }
-ctree.out <- party::ctree(formula,data.train)
+ctrl <- trainControl(method=samp.method)
+train.out <- train(formula,data.train,method="ctree",tuneLength=tuneLength,
+                   trControl=ctrl)
+ctree.out <- train.out$finalModel
 
 
 #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
@@ -39,41 +42,40 @@ if(length(var.name) > 0){
 }
 
 
-
+ctree.ret <- ctree.out
 
 
 return.matrix[1,"nvar"] <- length(unique(var.name))
 
 return.matrix[1,"nodes"] <- length(unique(nodes))
 
-
-
+ind <- as.numeric(row.names(train.out$bestTune))
 if(class.response == "numeric" | class.response == "integer"){
+  #which(train.out$results[,"cp"] == train.out$bestTune)
 
-  return.matrix[1,"misfit.train"] <- suppressWarnings(mean((data.train[,response] - predict(ctree.out))^2)/nrow(data.train))
-  return.matrix[1,"misfit.test"] <- suppressWarnings(mean((data.test[,response] -
-                                            predict(ctree.out,data.test))^2)/nrow(data.test))
+  return.matrix[1,"rmse.samp"] <- train.out$results[ind,"RMSE"]
+  #return.matrix[1,"misfit.train"] <- mean((data.train[,response] - predict(ctree.out))^2)/nrow(data.train)
+  return.matrix[1,"rsq.samp"] <- train.out$results[ind,"Rsquared"]
 
-  if(sd(predict(ctree.out)) == 0){
-    return.matrix[1,"rsq.train"] <- 0
+  if(subset==FALSE){
+    return.matrix[1,"rmse.test"] <- NA
+    return.matrix[1,"rsq.test"] <- NA
   }else{
-    return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(ctree.out)))**2)
+    return.matrix[1,"rmse.test"] <- mean((data.test[,response] -
+                                            predict(ctree.out,data.test))^2)/nrow(data.test)
+    return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(ctree.out,data.test)))**2
   }
-
-  if(sd(predict(ctree.out,data.test))==0){
-    return.matrix[1,"rsq.test"] <- 0
-  }else{
-    return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(ctree.out,data.test)))**2)
-  }
-
 }else{
-  return.matrix[1,"accuracy.train"] <- mean(as.numeric(predict(ctree.out)) == as.numeric(data.train[,response]))
-  return.matrix[1,"accuracy.test"] <- mean(as.numeric(predict(ctree.out,data.test)) == as.numeric(data.test[,response]))
+  return.matrix[1,"accuracy.samp"] <- train.out$results[ind,"Accuracy"]
+  #return.matrix[1,"accuracy.train"] <- mean(round(predict(ctree.out)[,2])+1 == as.numeric(data.train[,response]))
+  return.matrix[1,"accuracy.test"] <- mean(round(predict(ctree.out,data.test)[,2])+1 == as.numeric(data.test[,response]))
 }
 
 
+
 ret$vec <- return.matrix
-ret$ctree.ret <- ctree.out
+ret$ctree.ret <- ctree.ret
+ret$ctree.train <- train.out
 return(ret)
 
 }

@@ -15,7 +15,7 @@ out <- dtree(default ~ ., data=Default,methods=c("lm","rpart","tree","rf","evtre
 summary(out)
 
 
-ret <- stability(default ~ ., data=Default,methods=c("lm","rpart","ctree","evtree"))
+ret <- stable(default ~ ., data=Default,methods=c("lm","rpart","ctree","evtree"))
 ret
 
 rett <- unlist(ret)
@@ -37,8 +37,15 @@ evtree.out <- evtree::evtree(default ~ ., data=Default)
 library(stablelearner)
 library(MASS) # for boston data
 data(Boston)
-out <- dtree(medv ~., data=Boston,methods=c("rpart"),tuneLength=10,samp.method="cv")
-stabletree(out$rpart.out)
+
+
+out <- dtree(medv ~., data=Boston,methods=c("rpart","ctree","evtree"),tuneLength=2,samp.method="cv")
+out
+
+
+
+
+
 
 
 ctrl <- trainControl(method="repeatedcv")
@@ -51,6 +58,7 @@ varImp(train.out)
  summary(out)
 #' plot(out$rpart.out)
 tt <- rpart(medv ~., data=Boston)
+ttt <- ctree(medv ~., data=Boston)
 
 stab.out <- stable(formula=medv ~.,
                        data=Boston,

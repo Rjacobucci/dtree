@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(ISLR)\ndata(Default)\n\n\nlr.out <- glm(default~.,family=\"binomial\",data=Default)\nsummary(lr.out)\nsummary(lr.out)$coefficients[,\"Pr(>|z|)\"][-1]\n\nround(predict(lr.out,type=\"response\"))\n\nmean(round(predict(lr.out,type=\"response\"))+1 == as.numeric(Default$default))\n\n\nout <- dtree(default ~ ., data=Default,methods=c(\"lm\",\"rpart\",\"tree\",\"rf\",\"evtree\",\"ctree\"))\nsummary(out)\n\n\nret <- stable(default ~ ., data=Default,methods=c(\"lm\",\"rpart\",\"ctree\",\"evtree\"))\nret\n\nrett <- unlist(ret)\nresults <- matrix(rett,100,18,byrow=FALSE)\n\n\n\n\n\nout2 <- rpart(default ~ ., data=Default)\nout2\nlibrary(stablelearner)\nout8 <- stablelearner::stabletree(out2)\n\n\nevtree.out <- evtree::evtree(default ~ ., data=Default)\n\n\nlibrary(stablelearner)\nlibrary(MASS) # for boston data\ndata(Boston)\n\n\nout <- dtree(medv ~., data=Boston,methods=c(\"rpart\",\"ctree\",\"evtree\"),tuneLength=2,samp.method=\"cv\")\nout\n\n\n\n\n\n\n\nctrl <- trainControl(method=\"repeatedcv\")\ntrain.out <- train(medv ~., data=Boston,method=\"evtree\",tuneLength=1,\n                   trControl=ctrl)\nplot(train.out)\ntrain.out\nvarImp(train.out)\n\n summary(out)\n#' plot(out$rpart.out)\ntt <- rpart(medv ~., data=Boston)\nttt <- ctree(medv ~., data=Boston)\n\nstab.out <- stable(formula=medv ~.,\n                       data=Boston,\n                       methods=c(\"rpart\"),\n                       samp.method=\"cv\",\n                       tuneLength=2,\n                       n.rep=100,\n                       stablelearner=TRUE,\n                       subset=FALSE,\n                       perc.sub=.75,\n                       weights=NULL)\n\nout99 <- stablelearner::stabletree(train.out$finalModel,B=20)\nsummary(out99)\n",
+    "created" : 1484099521881.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1520879461",
+    "id" : "7C57BBF8",
+    "lastKnownWriteTime" : 1490133915,
+    "last_content_update" : 1490133915764,
+    "path" : "~/GitHub/dtree/class_ex.R",
+    "project_path" : "class_ex.R",
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

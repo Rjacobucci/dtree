@@ -54,6 +54,9 @@ vars2 <- vars[vars != "<leaf>"]
 return.matrix[1,"nvar"] <- length(unique(vars2))
 
 return.matrix[1,"nodes"] <- length(vars[vars == "<leaf>"])
+
+
+
 ind <- as.numeric(row.names(train.out$bestTune))
 if(class.response == "numeric" | class.response == "integer"){
    #which(train.out$results[,"cp"] == train.out$bestTune)

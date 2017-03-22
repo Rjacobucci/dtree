@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(ISLR)\ndata(Default)\nDefault=Default[1:1000,]\n\nlr.out <- glm(default~.,family=\"binomial\",data=Default)\nsummary(lr.out)\nsummary(lr.out)$coefficients[,\"Pr(>|z|)\"][-1]\n\nround(predict(lr.out,type=\"response\"))\n\nmean(round(predict(lr.out,type=\"response\"))+1 == as.numeric(Default$default))\n\n\nout <- dtree(default ~ ., data=Default,methods=c(\"ctree\"),tuneLength=2,samp.method=\"cv\")\nsummary(out)\n\n\ntrain.out <- train(default ~ ., data=Default,method=\"rpart\",\n                   trControl=ctrl,metric=Metric)\n\n\nret <- stable(default ~ ., data=Default,methods=c(\"ctree\"),\n              samp.method=\"cv\",tuneLength=2,stablelearner=TRUE)\nplot(ret$rpart)\nsummary(ret$evtree)\nsummary(ret$rpart)\n\nrett <- unlist(ret)\nresults <- matrix(rett,100,18,byrow=FALSE)\n\ntt = train(default ~ ., data=Default,method=\"evtree\",tuneLength=1)$finalModel\n\n\nlibrary(rpart.utils)\nrpart.subrules.table(tt)\n\n\nstr(partykit:::.list.rules.party(tt))\n\n\n(yy = CtreePathFunc(tt,Default))\n\n\nfor(i in 1:nrow(yy)){\n  pp <- list()\n  pp <- c(pp,unique(unlist(strsplit(levels(yy[i,2]), \",\"))))\n}\n\nmatt <- matrix(NA,length(pp),2)\nfor(j in 1:length(pp)){\n\n  rr <- strsplit(pp[[j]],\"[> <= ]\" )\n  rr2 <- rr[[1]][rr[[1]]!=\"\"]\n  matt[j,1] <- rr2[1]\n  matt[j,2] <- rr2[2]\n}\n\n\nvars <- ctree.ret$frame[,\"var\"]\nvars2 <- vars[vars != \"<leaf>\"]\nreturn.matrix[1,\"nvar\"] <- length(unique(vars2))\n\nreturn.matrix[1,\"nodes\"] <- length(vars[vars == \"<leaf>\"])\n\n\n\n\n\ntree1 <- partykit::ctree(default ~ ., data=Default,\n                         control=ctree_control(mincriterion=as.numeric(tt$bestTune)))\ntree2 <- prune(tree1,cp=as.numeric(tt$bestTune))\nee = stabletree(tree1)\nsummary(ee)\n\nout2 <- rpart(default ~ ., data=Default)\nout2\nlibrary(stablelearner)\nout8 <- stablelearner::stabletree(out2)\n\n\nevtree.out <- evtree::evtree(default ~ ., data=Default)\n\n\nlibrary(stablelearner)\nlibrary(MASS) # for boston data\ndata(Boston)\n\n\nout <- dtree(medv ~., data=Boston,methods=c(\"rpart\",\"ctree\",\"rf\"),tuneLength=2,samp.method=\"cv\")\nsummary(out)\n\n\n\n\n\n\n\nctrl <- trainControl(method=\"repeatedcv\")\ntrain.out <- train(medv ~., data=Boston,method=\"evtree\",tuneLength=1,\n                   trControl=ctrl)\nplot(train.out)\ntrain.out\nvarImp(train.out)\n\n summary(out)\n#' plot(out$rpart.out)\ntt <- rpart(medv ~., data=Boston)\nttt <- ctree(medv ~., data=Boston)\n\nstab.out <- stable(formula=medv ~.,\n                       data=Boston,\n                       methods=c(\"rpart\"),\n                       samp.method=\"cv\",\n                       tuneLength=2,\n                       n.rep=100,\n                       stablelearner=TRUE,\n                       subset=FALSE,\n                       perc.sub=.75,\n                       weights=NULL)\n\nout99 <- stablelearner::stabletree(train.out$finalModel,B=20)\nsummary(out99)\n",
+    "created" : 1488818603580.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "922621881",
+    "id" : "16CB1CD1",
+    "lastKnownWriteTime" : 1490214816,
+    "last_content_update" : 1490214816697,
+    "path" : "~/GitHub/dtree/class_ex.R",
+    "project_path" : "class_ex.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

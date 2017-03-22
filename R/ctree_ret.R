@@ -38,6 +38,26 @@ ctree.out <- train.out$finalModel
 #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
 
 nodes <- ctree.out@get_where()
+str(ctree.out@tree)
+ctree.out@tree$psplit$splitpoint
+ctree.out@tree$psplit$variableName
+
+tree.new <- ctree.out@tree
+
+
+mat <- data.frame(matrix(NA,15,2))
+for(i in seq(1,15,2)){
+ mat[i,1] <-  tree.new$left$psplit$splitpoint
+ mat[i,2] <-  tree.new$left$psplit$variableName
+ mat[i+1,1] <-  tree.new$left$psplit$splitpoint
+ mat[i+1,2] <-  tree.new$left$psplit$variableName
+
+ tree.new <- tree.new$left
+}
+
+
+
+
 return.matrix[1,"nsplits"] <- max(nodes) - length(unique(nodes))
 #return.matrix[1,"fit.cv"] <- cp[min.error,"xerror"]
 

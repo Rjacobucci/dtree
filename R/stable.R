@@ -15,6 +15,7 @@
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset. Defaults to 0.75
 #' @param weights Optional weights for each case.
+#' @param verbose
 #'
 #'
 #'
@@ -31,17 +32,18 @@ stable = function(formula,
                  stablelearner=FALSE,
                  subset=FALSE,
                  perc.sub=.75,
-                 weights=NULL){
+                 weights=NULL,
+                 verbose=FALSE){
 
   res <- list()
 
   if(stablelearner==FALSE){
-    print(2)
     for(i in 1:n.rep){
       set.seed(i)
+      print(i)
       ids <- sample(nrow(data),nrow(data),replace=TRUE)
       out[[i]] <- dtree(formula,data[ids,],methods,samp.method,
-                        tuneLength,subset,perc.sub,prune,weights)$return.matrix
+                        tuneLength,subset,perc.sub,prune,weights,verbose)$return.matrix
     }
     ret <- array(NA, dim=c(n.rep,length(methods),ncol(out[[1]])))
 
@@ -67,13 +69,39 @@ stable = function(formula,
     res$variances <- round(ret.var,3)
     res
   }else{
-    print(1)
-    out <- list()
-    tree <- dtree(formula,data,methods,samp.method,
-             tuneLength,subset,perc.sub,weights)$rpart.out
-    print(tree)
-    out <- stablelearner::stabletree(tree)
-    res$out <- out
+    methods2=methods
+    if(any(methods2==c("lm","rf"))) stop("only decision tree methods can be used with stable learner")
+
+    trees <- dtree(formula,data,methods=methods2,samp.method,
+          tuneLength,subset,perc.sub,prune,weights,verbose)
+
+
+    if(any(methods2==c("rpart"))){
+      formula2 <- terms(formula,data=data)
+      tree1 <- rpart(formula(formula2),data)
+      tree2 <- prune(tree1,cp=as.numeric(trees$rpart.train$bestTune))
+      res$rpart <- stablelearner::stabletree(tree2,data=data,B=100)
+    }
+
+    if(any(methods2==c("ctree"))){
+     # formula2 <- terms(formula,data=data)
+      #val = 1-as.numeric(trees$ctree.train$bestTune)
+      #ctrl=ctree_control()#(mincriterion=val)
+     # treet <- partykit::ctree(formula(formula2),data=data)#,control=ctrl)
+     # res$ctree <- stablelearner::stabletree(treet,data=data,formula=formula(formula2))
+      tt = train(default ~ ., data=Default,method="ctree")
+      tree1 <- partykit::ctree(default ~ income, data=Default,
+                               control=ctree_control(mincriterion=as.numeric(tt$bestTune)))
+     stablelearner::stabletree(tree1)
+    }
+
+    if(any(methods2==c("evtree"))){
+      tree <- dtree(formula,data,methods="evtree",samp.method,
+                    tuneLength,subset,perc.sub,prune,weights,verbose)$evtree.out
+      res$evtree <- stablelearner::stabletree(tree,data=data,B=100)
+    }
+
+
   }
 
 

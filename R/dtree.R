@@ -15,6 +15,7 @@
 #'        is allocated to test dataset. Defaults to 0.75
 #' @param prune Whether to prune rpart tree
 #' @param weights Optional weights for each case.
+#' @param verbose
 #'
 #'
 #' @importFrom stats cor fitted lm predict terms glm binomial sd
@@ -45,7 +46,8 @@ dtree = function(formula,
                  subset=FALSE,
                  perc.sub=.75,
                  prune=TRUE,
-                 weights){
+                 weights,
+                 verbose=TRUE){
 
   ret <- list()
   if(length(tuneLength)==1){
@@ -115,7 +117,7 @@ dtree = function(formula,
   # -----------------------------------------------------------------
 
   if(any(methods=="lm")){
-    cat("Currently running linear regression\n")
+    if(verbose==TRUE) cat("Currently running linear regression\n")
     ret0 <- lm_ret(formula, data.train,data.test,samp.method,tuneLength=1,subset, class.response,response,Metric)
     return.matrix["lm",] <- ret0$vec
     ret$lm.out <- ret0$rpart.ret
@@ -135,7 +137,7 @@ dtree = function(formula,
 
 
   if(any(methods=="rpart")){
-    cat("Currently running",tune.rpart, "rpart models\n")
+    if(verbose==TRUE) cat("Currently running",tune.rpart, "rpart models\n")
   ret1 <- rpart_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric)
   return.matrix["rpart",] <- ret1$vec
   ret$rpart.out <- ret1$rpart.ret
@@ -151,7 +153,7 @@ dtree = function(formula,
 
   # ----------------------------------------------------
   if(any(methods == "ctree")){
-    cat("Currently running",tune.ctree, "ctree models\n")
+    if(verbose==TRUE) cat("Currently running",tune.ctree, "ctree models\n")
     ret3 <- ctree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.ctree,subset, class.response,response,Metric)
     return.matrix["ctree",] <- ret3$vec
     ret$ctree.out <- ret3$ctree.ret
@@ -166,7 +168,7 @@ dtree = function(formula,
   # ---------------------------------------------------
 
   if(any(methods == "evtree")){
-    cat("Currently running",tune.evtree, "evtree models\n")
+    if(verbose==TRUE) cat("Currently running",tune.evtree, "evtree models\n")
     ret4 <- evtree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.evtree,subset, class.response,response,Metric)
     return.matrix["evtree",] <- ret4$vec
     ret$evtree.out <- ret4$evtree.ret
@@ -180,7 +182,7 @@ dtree = function(formula,
   # ---------------------------------------------------
 
   if(any(methods == "rf")){
-    cat("Currently running",tune.rf, "random forest models\n")
+    if(verbose==TRUE) cat("Currently running",tune.rf, "random forest models\n")
     ret5 <- rf_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rf,subset, class.response,response,Metric)
     return.matrix["rf",] <- ret5$vec
     ret$rf.out <- ret5$rf.ret

@@ -9,7 +9,7 @@ dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
   perc.sub = 0.75, prune = TRUE, weights)
 }
 \arguments{
-\item{formula}{a formula, weight a response to left of ~.}
+\item{formula}{a formula, with a response to left of ~.}
 
 \item{data}{Data frame to run models on}
 

@@ -1,48 +1,80 @@
 
-rf_ret <- function(formula, data.train, data.test,class.response, response){
+rf_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,class.response, response,Metric){
   ret <- list()
 
+
   if(class.response == "numeric" | class.response == "integer"){
-    return.matrix <- matrix(NA,1,8)
-    colnames(return.matrix) <- c("nodes","nvar","nsplits","misfit.cv",
-                                 "misfit.train","rsq.train","misfit.test","rsq.test")
+    return.matrix <- matrix(NA,1,7)
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","rmse.samp",
+                                 "rsq.samp","rmse.test","rsq.test")
+
+    repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
+    ctrl <- trainControl(method=samp.method,repeats=repeats)
   }else{
-    return.matrix <- matrix(NA,1,6)
-    colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.cv",
-                                 "accuracy.train","accuracy.test")
+    return.matrix <- matrix(NA,1,7)
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
+                                 "accuracy.samp","auc.test","accuracy.test")
+    fiveStats <- function(...) c(twoClassSummary(...),
+                                 + defaultSummary(...))
+    ## Everything but the area under the ROC curve:
+    fourStats <- function (data, lev = levels(data$obs), model = NULL)
+    {
+
+      accKapp<-postResample(data[,"pred"],data[,"obs"])
+      out<-c(accKapp,
+             sensitivity(data[, "pred"], data[, "obs"], lev[1]),
+             specificity(data[, "pred"], data[, "obs"], lev[2]))
+      names(out)[3:4]<-c("Sens","Spec")
+      out
+    }
+    repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
+    ctrl <- trainControl(method=samp.method,classProbs=TRUE,summaryFunction = fiveStats,repeats=repeats)
+
+
   }
 
 
-if(class.response == "numeric" | class.response == "integer"){
-  rf.out <- train(formula,data.train,method="rf",
-                  trControl=trainControl(method="cv"),importance=TRUE)
-}else{
-  rf.out <- train(formula,data.train,method="rf",metric="Accuracy",
-                  trControl=trainControl(method="cv"),importance=TRUE)
-}
+
+  train.out <- train(formula,data.train,method="rf",tuneLength=tuneLength,
+                     trControl=ctrl,metric=Metric)
+  rf.out <- train.out$finalModel
 
 
+  rf.ret <- rf.out
 
 
+  ind <- as.numeric(row.names(train.out$bestTune))
+  if(class.response == "numeric" | class.response == "integer"){
+    #which(train.out$results[,"cp"] == train.out$bestTune)
 
+    return.matrix[1,"rmse.samp"] <- train.out$results[ind,"RMSE"]
+    #return.matrix[1,"misfit.train"] <- mean((data.train[,response] - predict(rf.out))^2)/nrow(data.train)
+    return.matrix[1,"rsq.samp"] <- train.out$results[ind,"Rsquared"]
 
-if(class.response == "numeric" | class.response == "integer"){
+    if(subset==FALSE){
+      return.matrix[1,"rmse.test"] <- NA
+      return.matrix[1,"rsq.test"] <- NA
+    }else{
+      return.matrix[1,"rmse.test"] <- mean((data.test[,response] -
+                                              predict(rf.out,data.test))^2)/nrow(data.test)
+      return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(rf.out,data.test)))**2
+    }
+  }else{
+    return.matrix[1,"auc.samp"] <- train.out$results[ind,"ROC"]
+    return.matrix[1,"accuracy.samp"] <- train.out$results[ind,"Accuracy"]
 
-  return.matrix[1,"misfit.train"] <- suppressWarnings(mean((data.train[,response] - predict(rf.out))^2)/nrow(data.train))
-  return.matrix[1,"misfit.test"] <- suppressWarnings(mean((data.test[,response] -
-                                            predict(rf.out,data.test))^2)/nrow(data.test))
-  return.matrix[1,"misfit.cv"] <- min(rf.out$results$RMSE)/(.75*nrow(data.train))
-  return.matrix[1,"rsq.train"] <- suppressWarnings((cor(data.train[,response],predict(rf.out)))**2)
-  return.matrix[1,"rsq.test"] <- suppressWarnings((cor(data.test[,response],predict(rf.out,data.test)))**2)
-}else{
-  return.matrix[1,"accuracy.cv"] <- max(rf.out$results$Accuracy)
-  return.matrix[1,"accuracy.train"] <- mean(predict(rf.out) == data.train[,response])
-  return.matrix[1,"accuracy.test"] <- mean(predict(rf.out,data.test) == data.test[,response])
-}
+    if(subset==FALSE){
+      return.matrix[1,"auc.test"] <- NA
+    }else{
+      return.matrix[1,"auc.test"] <- NA
+    }
+  }
 
+  #}
 
-ret$vec <- return.matrix
-ret$rf.ret <- rf.out
+  ret$vec <- return.matrix
+  ret$rf.ret <- rf.ret
+  ret$rf.train <- train.out
 return(ret)
 
 }

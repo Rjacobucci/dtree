@@ -1,6 +1,6 @@
 library(ISLR)
 data(Default)
-
+Default=Default[1:500,]
 
 lr.out <- glm(default~.,family="binomial",data=Default)
 summary(lr.out)
@@ -11,8 +11,12 @@ round(predict(lr.out,type="response"))
 mean(round(predict(lr.out,type="response"))+1 == as.numeric(Default$default))
 
 
-out <- dtree(default ~ ., data=Default,methods=c("lm","rpart","tree","rf","evtree","ctree"))
+out <- dtree(default ~ ., data=Default,methods=c("rpart","lm","ctree"),tuneLength=2,samp.method="repeatedcv")
 summary(out)
+
+
+train.out <- train(default ~ ., data=Default,method="glm",
+                   trControl=ctrl,metric=Metric)
 
 
 ret <- stable(default ~ ., data=Default,methods=c("lm","rpart","ctree","evtree"))
@@ -39,8 +43,8 @@ library(MASS) # for boston data
 data(Boston)
 
 
-out <- dtree(medv ~., data=Boston,methods=c("rpart","ctree","evtree"),tuneLength=2,samp.method="cv")
-out
+out <- dtree(medv ~., data=Boston,methods=c("rpart","ctree","rf"),tuneLength=2,samp.method="cv")
+summary(out)
 
 
 

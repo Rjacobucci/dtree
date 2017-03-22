@@ -1,6 +1,6 @@
 #' Main function for creating different types of decision trees
 #'
-#' @param formula a formula, weight a response to left of ~.
+#' @param formula a formula, with a response to left of ~.
 #' @param data Data frame to run models on
 #' @param methods Which tree methods to use. Defaults:
 #'        lm, rpart, ctree, evtree. Also can use "rf" for random forests
@@ -96,11 +96,15 @@ dtree = function(formula,
     rownames(return.matrix) <- methods
     colnames(return.matrix) <- c("nodes","nvar","nsplits","rmse.samp",
                                  "rsq.samp","rmse.test","rsq.test")
+    Metric="RMSE"
   }else{
-    return.matrix <- matrix(NA,length(methods),5)
+    return.matrix <- matrix(NA,length(methods),7)
     rownames(return.matrix) <- methods
-    colnames(return.matrix) <- c("nodes","nvar","nsplits","accuracy.samp",
-                                 "accuracy.test")
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
+                                 "accuracy.samp","auc.test","accuracy.test")
+
+    Metric="ROC"
+
   }
 
 
@@ -111,10 +115,11 @@ dtree = function(formula,
   # -----------------------------------------------------------------
 
   if(any(methods=="lm")){
-
-    ret0 <- lm_ret(formula, data.train,data.test,class.response,response)
+    cat("Currently running linear regression\n")
+    ret0 <- lm_ret(formula, data.train,data.test,samp.method,tuneLength=1,subset, class.response,response,Metric)
     return.matrix["lm",] <- ret0$vec
-    ret$lm.out <- ret0$lm.ret
+    ret$lm.out <- ret0$rpart.ret
+    ret$lm.train <- ret0$lm.train
 
 
 
@@ -131,7 +136,7 @@ dtree = function(formula,
 
   if(any(methods=="rpart")){
     cat("Currently running",tune.rpart, "rpart models\n")
-  ret1 <- rpart_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response)
+  ret1 <- rpart_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric)
   return.matrix["rpart",] <- ret1$vec
   ret$rpart.out <- ret1$rpart.ret
   ret$rpart.train <- ret1$rpart.train
@@ -147,7 +152,7 @@ dtree = function(formula,
   # ----------------------------------------------------
   if(any(methods == "ctree")){
     cat("Currently running",tune.ctree, "ctree models\n")
-    ret3 <- ctree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.ctree,subset, class.response,response)
+    ret3 <- ctree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.ctree,subset, class.response,response,Metric)
     return.matrix["ctree",] <- ret3$vec
     ret$ctree.out <- ret3$ctree.ret
     ret$ctree.train <- ret3$ctree.train
@@ -162,7 +167,7 @@ dtree = function(formula,
 
   if(any(methods == "evtree")){
     cat("Currently running",tune.evtree, "evtree models\n")
-    ret4 <- evtree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.evtree,subset, class.response,response)
+    ret4 <- evtree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.evtree,subset, class.response,response,Metric)
     return.matrix["evtree",] <- ret4$vec
     ret$evtree.out <- ret4$evtree.ret
     ret$evtree.train <- ret4$evtree.train
@@ -176,7 +181,7 @@ dtree = function(formula,
 
   if(any(methods == "rf")){
     cat("Currently running",tune.rf, "random forest models\n")
-    ret5 <- rf_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rf,subset, class.response,response)
+    ret5 <- rf_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rf,subset, class.response,response,Metric)
     return.matrix["rf",] <- ret5$vec
     ret$rf.out <- ret5$rf.ret
     ret$rf.train <- ret5$rf.train

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\nrpart_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,class.response, response,Metric){\n\nret <- list()\n\nif(class.response == \"numeric\" | class.response == \"integer\"){\n  return.matrix <- matrix(NA,1,7)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"rmse.samp\",\n                              \"rsq.samp\",\"rmse.test\",\"rsq.test\")\n  repeats <- ifelse(grepl(\"repeatedcv\", samp.method), 10, 1)\n  ctrl <- trainControl(method=samp.method,repeats=repeats)\n}else{\n  return.matrix <- matrix(NA,1,7)\n  colnames(return.matrix) <- c(\"nodes\",\"nvar\",\"nsplits\",\"auc.samp\",\n                               \"accuracy.samp\",\"auc.test\",\"accuracy.test\")\n\n  fiveStats <- function(...) c(twoClassSummary(...),\n                               + defaultSummary(...))\n  ## Everything but the area under the ROC curve:\n  fourStats <- function (data, lev = levels(data$obs), model = NULL)\n  {\n\n    accKapp<-postResample(data[,\"pred\"],data[,\"obs\"])\n    out<-c(accKapp,\n           sensitivity(data[, \"pred\"], data[, \"obs\"], lev[1]),\n           specificity(data[, \"pred\"], data[, \"obs\"], lev[2]))\n    names(out)[3:4]<-c(\"Sens\",\"Spec\")\n    out\n  }\n  repeats <- ifelse(grepl(\"repeatedcv\", samp.method), 10, 1)\n  ctrl <- trainControl(method=samp.method,classProbs=TRUE,summaryFunction = fiveStats,repeats=repeats)\n}\n\n#rpart.out <- rpart(formula,data.train)\n\n\ntrain.out <- train(formula,data.train,method=\"rpart\",tuneLength=tuneLength,\n                   trControl=ctrl,metric=Metric)\nrpart.out <- train.out$finalModel\n\ncp <- rpart.out$cptable\nmin.error <- which(min(cp[,\"rel error\"]) == cp[,\"rel error\"])[1]\nreturn.matrix[1,\"nsplits\"] <- cp[min.error,\"nsplit\"]\n#train.out$varImp\n\n\n\n  rpart.ret <- rpart.out\n\n\n\nvars <- rpart.ret$frame[,\"var\"]\nvars2 <- vars[vars != \"<leaf>\"]\nreturn.matrix[1,\"nvar\"] <- length(unique(vars2))\n\nreturn.matrix[1,\"nodes\"] <- length(vars[vars == \"<leaf>\"])\nind <- as.numeric(row.names(train.out$bestTune))\nif(class.response == \"numeric\" | class.response == \"integer\"){\n   #which(train.out$results[,\"cp\"] == train.out$bestTune)\n\n  return.matrix[1,\"rmse.samp\"] <- train.out$results[ind,\"RMSE\"]\n  #return.matrix[1,\"misfit.train\"] <- mean((data.train[,response] - predict(rpart.out))^2)/nrow(data.train)\n  return.matrix[1,\"rsq.samp\"] <- train.out$results[ind,\"Rsquared\"]\n\n      if(subset==FALSE){\n        return.matrix[1,\"rmse.test\"] <- NA\n        return.matrix[1,\"rsq.test\"] <- NA\n      }else{\n        return.matrix[1,\"rmse.test\"] <- mean((data.test[,response] -\n                                                  predict(rpart.out,data.test))^2)/nrow(data.test)\n        return.matrix[1,\"rsq.test\"] <- (cor(data.test[,response],predict(rpart.out,data.test)))**2\n      }\n}else{\n  return.matrix[1,\"auc.samp\"] <- train.out$results[ind,\"ROC\"]\n  return.matrix[1,\"accuracy.samp\"] <- train.out$results[ind,\"Accuracy\"]\n\n  if(subset==FALSE){\n    return.matrix[1,\"auc.test\"] <- NA\n  }else{\n    return.matrix[1,\"auc.test\"] <- NA\n  }\n}\n\n\nret$vec <- return.matrix\nret$rpart.ret <- rpart.ret\nret$rpart.train <- train.out\nreturn(ret)\n\n}\n",
+    "created" : 1488843900797.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1067602323",
+    "id" : "5ACEB4CB",
+    "lastKnownWriteTime" : 1490142096,
+    "last_content_update" : 1490142096674,
+    "path" : "~/GitHub/dtree/R/rpart_ret.R",
+    "project_path" : "R/rpart_ret.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

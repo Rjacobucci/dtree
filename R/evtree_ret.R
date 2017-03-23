@@ -64,6 +64,36 @@ for(i in 1:len){
   }
 }
 
+
+
+return.splits <- list()
+
+if(return.matrix[1,"nsplits"] == 0){
+  return.splits <- NA
+}else{
+  ret1 <- partykit:::.list.rules.party(evtree.out)
+
+  pp <- list()
+  for(i in 1:length(ret1)){
+    bb <- gsub("[> <= ]", "", ret1[i])
+    tt <- c(unique(unlist(strsplit(bb, "&"))))
+    pp = unique(c(pp,tt))
+  }
+  ret2 <- unique(pp)
+  ret3 <- data.frame(matrix(NA, length(ret2),2))
+
+  for(j in 1:length(ret2)){
+    ret3[j,1] <- stringr::str_extract(ret2[[j]], "[aA-zZ]+")
+    ret3[j,2] <- as.numeric(as.character(stringr::str_extract(ret2[[j]],  "\\d+\\.*\\d*")))
+  }
+
+  #ret3[,2] <- round(ret3[,2],3)
+  colnames(ret3) <- c("var","val")
+  return.splits <- ret3
+}
+
+
+
 vars2 <- vars[is.na(vars)==FALSE]
 vars3 <- length(unique(vars2))
 
@@ -104,7 +134,7 @@ if(class.response == "numeric" | class.response == "integer"){
 }
 
 #}
-
+ret$return.splits <- return.splits
 ret$vec <- return.matrix
 ret$evtree.ret <- evtree.ret
 ret$evtree.train <- train.out

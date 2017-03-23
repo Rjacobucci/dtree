@@ -28,18 +28,33 @@ summary(ret$rpart)
 rett <- unlist(ret)
 results <- matrix(rett,100,18,byrow=FALSE)
 
-tt = train(default ~ ., data=Default,method="evtree",tuneLength=1)$finalModel
+tt = train(default ~ ., data=Default,method="rpart",tuneLength=1)$finalModel
 
 
-library(rpart.utils)
-rpart.subrules.table(tt)
+
+rpart.utils::rpart.subrules.table(tt)
 
 
 str(partykit:::.list.rules.party(tt))
 
 
 (yy = CtreePathFunc(tt,Default))
+yy = out$evtree.splits
 
+
+yy[1]
+
+#pp <- data.frame(matrix(NA,length(yy),1))
+pp <- list()
+for(i in 1:length(yy)){
+  bb <- gsub("[> <= ]", "", yy[i])
+  tt <- c(unique(unlist(strsplit(bb, "&"))))
+  pp = unique(c(pp,tt))
+}
+oo <- unique(pp)
+gsub("[[:digit:]]","",oo[[1]])
+(stringr::str_extract(oo[[1]], "[aA-zZ]+"))
+(stringr::str_extract(oo[[1]],  "\\d+\\.*\\d*"))
 
 for(i in 1:nrow(yy)){
   pp <- list()
@@ -86,13 +101,100 @@ library(MASS) # for boston data
 data(Boston)
 
 
-out <- dtree(medv ~., data=Boston,methods=c("rpart","ctree","rf"),tuneLength=2,samp.method="cv")
-summary(out)
+out <- dtree(medv ~., data=Boston,methods=c("ctree"),tuneLength=2,samp.method="cv")
+#summary(out)
+out
+
+
+
+
+stab.out <- stable(formula=medv ~.,
+                   data=Boston[1:100,],
+                   methods=c("rpart","evtree","ctree"),
+                   samp.method="cv",
+                   tuneLength=2,
+                   n.rep=3,
+                   stablelearner=FALSE,
+                   subset=FALSE,
+                   perc.sub=.75,
+                   weights=NULL)
+stab.out
+
+nn <- stab.out$nn
+
+length(unique(nn[,1])) == 1
+sapply(split(nn, nn$var),table)
+
+ww <- stab.out$where.freq$age
+sapply(split(where.freq, where.freq$var),
+       table)
+
+for(i in 1:length(ww)){
+  print(sapply(split(ww[[i]], ww[[i]]$var),
+         table))
+}
+
+hh <- out$ctree.splits
+tab <- table(hh[,1])
+
+hh[,2]
+
+sapply(split(hh, hh$var),
+         table)
+
+nn <- plyr::ldply(ww)
+sapply(split(nn, nn$var),
+       table)
+
+unlist(ww,recursive=FALSE)
+
+table(hh[,2])
+
+tt = terms(formula,data=Boston)
+tt = terms(formula,data=data)
+preds <- attr(tt,"term.labels")
+var.count <- matrix(NA,n.rep,length(preds))
+colnames(var.count) <- preds
+
+
+for(j in 1:length(preds)){
+  var.count[preds[j]] <- tab[preds[j]]
+  if(is.na(var.count[preds[j]]==TRUE)) var.count[preds[j]] <- 0
+}
+
+
+
+
+table(hh[,1])
+
+pp <- list()
+for(i in 1:length(hh$Path)){
+  bb <- gsub("[> <= ]", "", hh$Path[i])
+  tt <- c(unique(unlist(strsplit(bb, ","))))
+  pp = unique(c(pp,tt))
+}
+ret2 <- unique(pp)
+ret3 <- data.frame(matrix(NA, length(ret2),2))
+
+for(j in 1:length(ret2)){
+  ret3[j,1] <- stringr::str_extract(ret2[[j]], "[aA-zZ]+")
+  ret3[j,2] <- as.numeric(as.character(stringr::str_extract(ret2[[j]],  "\\d+\\.*\\d*")))
+}
+
+#ret3[,2] <- round(ret3[,2],3)
+colnames(ret3) <- c("var","val")
+return.splits <- ret3
 
 
 
 
 
+
+
+
+hh2 <- hh[is.na(hh$Less == FALSE),]
+hh3 <- hh2[,c("Variable","Value")]
+colnames(hh3) <- c("var","val")
 
 
 ctrl <- trainControl(method="repeatedcv")
@@ -105,7 +207,8 @@ varImp(train.out)
  summary(out)
 #' plot(out$rpart.out)
 tt <- rpart(medv ~., data=Boston)
-ttt <- ctree(medv ~., data=Boston)
+ttt <- evtree(medv ~., data=Boston)
+partykit:::.list.rules.party(ttt)
 
 stab.out <- stable(formula=medv ~.,
                        data=Boston,

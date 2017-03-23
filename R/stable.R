@@ -36,6 +36,8 @@ stable = function(formula,
                  verbose=FALSE){
 
   res <- list()
+  out <- list()
+  out2 <- list()
 
   if(stablelearner==FALSE){
     for(i in 1:n.rep){
@@ -43,12 +45,14 @@ stable = function(formula,
       print(i)
       ids <- sample(nrow(data),nrow(data),replace=TRUE)
       out[[i]] <- dtree(formula,data[ids,],methods,samp.method,
-                        tuneLength,subset,perc.sub,prune,weights,verbose)$return.matrix
+                        tuneLength,subset,perc.sub,prune,weights,verbose)
+
+      out2[[i]] <- out[[i]]$return.matrix
     }
-    ret <- array(NA, dim=c(n.rep,length(methods),ncol(out[[1]])))
+    ret <- array(NA, dim=c(n.rep,length(methods),ncol(out2[[1]])))
 
     for(j in 1:n.rep){
-      ret[j,,] <- out[[j]]
+      ret[j,,] <- out2[[j]]
     }
 
     ret.mean <- apply(ret,3,colMeans,na.rm=TRUE)
@@ -60,15 +64,113 @@ stable = function(formula,
     row.names(ret.mean) <- methods
     row.names(ret.var) <- methods
 
-    colnames(ret.mean) <- colnames(out[[i]])
-    colnames(ret.var) <- colnames(out[[i]])
+    colnames(ret.mean) <- colnames(out2[[i]])
+    colnames(ret.var) <- colnames(out2[[i]])
+
+
+    tt = terms(x=formula,data=data)
+    preds <- attr(tt,"term.labels")
+
+    counts.mean <- matrix(NA,length(methods),length(preds))
+    counts.var <- matrix(NA,length(methods),length(preds))
+    rownames(counts.mean) <- rownames(counts.var) <- methods
+    colnames(counts.mean) <- colnames(counts.var) <- preds
 
 
 
+
+    if(any(methods==c("ctree"))){
+      var.count <- matrix(NA,n.rep,length(preds))
+      colnames(var.count) <- preds
+      where.ctree <- list()
+      for(i in 1:n.rep){
+        hh <- out[[i]]$ctree.splits
+        tab <- table(hh[,1])
+        where.ctree[[i]] <- hh
+
+        for(j in 1:length(preds)){
+          var.count[i,preds[j]] <- tab[preds[j]]
+          if(is.na(var.count[i,preds[j]]==TRUE)) var.count[i,preds[j]] <- 0
+        }
+      }
+
+      counts.mean["ctree",] <- colMeans(var.count)
+      counts.var["ctree",] <- round(matrixStats::colVars(var.count),2)
+      nn <- plyr::ldply(where.ctree)
+      if(length(unique(nn[,1])) == 1){
+        res$where.ctree <- table(nn)
+      }else{
+        res$where.ctree <- sapply(split(nn, nn$var),table)
+      }
+
+    }
+
+
+    if(any(methods==c("rpart"))){
+      var.count <- matrix(NA,n.rep,length(preds))
+      colnames(var.count) <- preds
+      where.rpart <- list()
+
+      for(i in 1:n.rep){
+        hh <- out[[i]]$rpart.splits
+        tab <- table(hh[,1])
+        where.rpart[[i]] <- hh
+
+        for(j in 1:length(preds)){
+          var.count[i,preds[j]] <- tab[preds[j]]
+          if(is.na(var.count[i,preds[j]]==TRUE)) var.count[i,preds[j]] <- 0
+        }
+      }
+
+      counts.mean["rpart",] <- colMeans(var.count)
+      counts.var["rpart",] <- round(matrixStats::colVars(var.count),2)
+      nn <- plyr::ldply(where.rpart)
+      if(length(unique(nn[,1])) == 1){
+        res$where.rpart <- table(nn)
+      }else{
+        res$where.rpart <- sapply(split(nn, nn$var),table)
+      }
+
+    }
+
+
+
+    if(any(methods==c("evtree"))){
+      var.count <- matrix(NA,n.rep,length(preds))
+      colnames(var.count) <- preds
+      where.evtree <- list()
+
+      for(i in 1:n.rep){
+        hh <- out[[i]]$evtree.splits
+        tab <- table(hh[,1])
+        where.evtree[[i]] <- hh
+
+        for(j in 1:length(preds)){
+          var.count[i,preds[j]] <- tab[preds[j]]
+          if(is.na(var.count[i,preds[j]]==TRUE)) var.count[i,preds[j]] <- 0
+        }
+      }
+
+      counts.mean["evtree",] <- colMeans(var.count)
+      counts.var["evtree",] <- round(matrixStats::colVars(var.count),2)
+      nn <- plyr::ldply(where.evtree)
+      if(length(unique(nn[,1])) == 1){
+        res$where.evtree <- table(nn)
+      }else{
+        res$where.evtree <- sapply(split(nn, nn$var),table)
+      }
+    }
+
+
+
+    res$counts.mean <- counts.mean
+    res$counts.var <- counts.var
     res$means <- round(ret.mean,3)
     res$variances <- round(ret.var,3)
     res
   }else{
+
+    stop("Curently not working")
     methods2=methods
     if(any(methods2==c("lm","rf"))) stop("only decision tree methods can be used with stable learner")
 

@@ -38,22 +38,6 @@ ctree.out <- train.out$finalModel
 #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
 
 nodes <- ctree.out@get_where()
-str(ctree.out@tree)
-ctree.out@tree$psplit$splitpoint
-ctree.out@tree$psplit$variableName
-
-tree.new <- ctree.out@tree
-
-
-mat <- data.frame(matrix(NA,15,2))
-for(i in seq(1,15,2)){
- mat[i,1] <-  tree.new$left$psplit$splitpoint
- mat[i,2] <-  tree.new$left$psplit$variableName
- mat[i+1,1] <-  tree.new$left$psplit$splitpoint
- mat[i+1,2] <-  tree.new$left$psplit$variableName
-
- tree.new <- tree.new$left
-}
 
 
 
@@ -86,6 +70,40 @@ return.matrix[1,"nvar"] <- length(unique(var.name))
 
 return.matrix[1,"nodes"] <- length(unique(nodes))
 
+
+
+return.splits <- list()
+
+if(return.matrix[1,"nsplits"] == 0){
+  return.splits <- NA
+}else{
+
+  hh <- CtreePathFunc(ctree.out,data=data.train)
+
+  pp <- list()
+  for(i in 1:length(hh$Path)){
+    bb <- gsub("[> <= ]", "", hh$Path[i])
+    tt <- c(unique(unlist(strsplit(bb, ","))))
+    pp = unique(c(pp,tt))
+  }
+  ret2 <- unique(pp)
+  ret3 <- data.frame(matrix(NA, length(ret2),2))
+
+  for(j in 1:length(ret2)){
+    ret3[j,1] <- stringr::str_extract(ret2[[j]], "[aA-zZ]+")
+    ret3[j,2] <- as.numeric(as.character(stringr::str_extract(ret2[[j]],  "\\d+\\.*\\d*")))
+  }
+
+  #ret3[,2] <- round(ret3[,2],3)
+  colnames(ret3) <- c("var","val")
+  return.splits <- ret3
+}
+
+
+
+
+
+
 ind <- as.numeric(row.names(train.out$bestTune))
 if(class.response == "numeric" | class.response == "integer"){
   #which(train.out$results[,"cp"] == train.out$bestTune)
@@ -114,7 +132,7 @@ if(class.response == "numeric" | class.response == "integer"){
 }
 
 
-
+ret$return.splits <- return.splits
 ret$vec <- return.matrix
 ret$ctree.ret <- ctree.ret
 ret$ctree.train <- train.out

@@ -7,7 +7,7 @@
 stable(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
   samp.method = "repeatedcv", tuneLength = 3, n.rep = 100,
   stablelearner = FALSE, subset = FALSE, perc.sub = 0.75,
-  weights = NULL)
+  weights = NULL, verbose = FALSE)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
@@ -34,6 +34,8 @@ calculate stability}
 is allocated to test dataset. Defaults to 0.75}
 
 \item{weights}{Optional weights for each case.}
+
+\item{verbose}{}
 }
 \description{
 Main function to calculate stability coefficients

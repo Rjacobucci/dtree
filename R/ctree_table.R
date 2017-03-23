@@ -38,23 +38,24 @@ CtreePathFunc <- function (ct, data) {
     ResulTable <- rbind(ResulTable, cbind(Node = Node, Path = Path2))
   }
   return(ResulTable)
+
 }
 
 
+#yy = CtreePathFunc(tt,data)
 
-(yy = CtreePathFunc(tt,Default))
 
+#for(i in 1:nrow(yy)){
+#  pp <- list()
+#  pp <- c(pp,unique(unlist(strsplit(levels(yy[i,2]), ","))))
+#}
 
-for(i in 1:nrow(yy)){
-  pp <- list()
-  pp <- c(pp,unique(unlist(strsplit(levels(yy[i,2]), ","))))
-}
+#matt <- matrix(NA,length(pp),2)
+#for(j in 1:length(pp)){
+#
+#  rr <- strsplit(pp[[j]],"[> <= ]" )
+#  rr2 <- rr[[1]][rr[[1]]!=""]
+#  matt[j,1] <- rr2[1]
+#  matt[j,2] <- as.numeric(rr2[2])
+#}
 
-matt <- matrix(NA,length(pp),2)
-for(j in 1:length(pp)){
-
-  rr <- strsplit(pp[[j]],"[> <= ]" )
-  rr2 <- rr[[1]][rr[[1]]!=""]
-  matt[j,1] <- rr2[1]
-  matt[j,2] <- as.numeric(rr2[2])
-}

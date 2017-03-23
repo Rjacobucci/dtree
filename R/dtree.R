@@ -142,7 +142,7 @@ dtree = function(formula,
   return.matrix["rpart",] <- ret1$vec
   ret$rpart.out <- ret1$rpart.ret
   ret$rpart.train <- ret1$rpart.train
-
+  ret$rpart.splits <- ret1$return.splits
 
 
   }
@@ -158,6 +158,7 @@ dtree = function(formula,
     return.matrix["ctree",] <- ret3$vec
     ret$ctree.out <- ret3$ctree.ret
     ret$ctree.train <- ret3$ctree.train
+    ret$ctree.splits <- ret3$return.splits
   }
 
 
@@ -173,6 +174,7 @@ dtree = function(formula,
     return.matrix["evtree",] <- ret4$vec
     ret$evtree.out <- ret4$evtree.ret
     ret$evtree.train <- ret4$evtree.train
+    ret$evtree.splits <- ret4$return.splits
   }
 
   #----------------------------------------------------

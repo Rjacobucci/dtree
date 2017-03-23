@@ -6,7 +6,7 @@
 \usage{
 dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
   samp.method = "repeatedcv", tuneLength = 3, subset = FALSE,
-  perc.sub = 0.75, prune = TRUE, weights)
+  perc.sub = 0.75, prune = TRUE, weights, verbose = TRUE)
 }
 \arguments{
 \item{formula}{a formula, with a response to left of ~.}
@@ -32,6 +32,8 @@ is allocated to test dataset. Defaults to 0.75}
 \item{prune}{Whether to prune rpart tree}
 
 \item{weights}{Optional weights for each case.}
+
+\item{verbose}{}
 }
 \description{
 Main function for creating different types of decision trees

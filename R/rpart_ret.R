@@ -55,6 +55,22 @@ return.matrix[1,"nvar"] <- length(unique(vars2))
 
 return.matrix[1,"nodes"] <- length(vars[vars == "<leaf>"])
 
+return.splits <- list()
+
+if(cp[min.error,"nsplit"] == 0){
+  return.splits <- NA
+}else{
+  hh <- rpart.utils::rpart.subrules.table(rpart.out)
+
+  hh2 <- hh[is.na(hh$Less == FALSE),]
+  hh3 <- hh2[,c("Variable","Value")]
+  colnames(hh3) <- c("var","val")
+  hh3[,1] <- as.character(hh3[,1])
+  hh3[,2] <- round(as.numeric(as.character(hh3[,2])),3)
+  row.names(hh3) <- c()
+  return.splits <- hh3
+}
+
 
 
 ind <- as.numeric(row.names(train.out$bestTune))
@@ -84,7 +100,7 @@ if(class.response == "numeric" | class.response == "integer"){
   }
 }
 
-
+ret$return.splits <- return.splits
 ret$vec <- return.matrix
 ret$rpart.ret <- rpart.ret
 ret$rpart.train <- train.out

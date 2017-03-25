@@ -1,10 +1,10 @@
 Package: dtree
 Type: Package
 Title: Decision Trees
-Version: 0.0.0.999
+Version: 0.1.1
 Author: Ross Jacobucci
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
-Description: Combined various decision tree algorithms, plus both
+Description: Combines various decision tree algorithms, plus both
              linear regression and ensemble methods into one package.
              Allows for the use of both continuous and categorical outcomes.
              An optional feature is to quantify the (in)stability to the
@@ -23,7 +23,6 @@ Suggests: randomForest,
           ISLR,
           matrixStats,
           partykit,
-          stablelearner,
           plyr,
           rpart.utils,
           stringr

@@ -6,7 +6,7 @@
 \usage{
 dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
   samp.method = "repeatedcv", tuneLength = 3, subset = FALSE,
-  perc.sub = 0.75, weights, verbose = TRUE)
+  perc.sub = 0.75, weights = NULL, verbose = TRUE)
 }
 \arguments{
 \item{formula}{a formula, with a response to left of ~.}

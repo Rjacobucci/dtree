@@ -43,8 +43,12 @@ dtree = function(formula,
                  tuneLength=3,
                  subset=FALSE,
                  perc.sub=.75,
-                 weights,
+                 weights=NULL,
                  verbose=TRUE){
+
+  if(is.null(weights)==FALSE){
+    stop("weights are currently not implemented")
+  }
 
   ret <- list()
   if(length(tuneLength)==1){

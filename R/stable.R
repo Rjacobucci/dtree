@@ -224,7 +224,7 @@ stable = function(formula,
       formula2 <- terms(formula,data=data)
       tree1 <- rpart(formula(formula2),data)
       tree2 <- prune(tree1,cp=as.numeric(trees$rpart.train$bestTune))
-      res$rpart <- stablelearner::stabletree(tree2,data=data,B=100)
+     # res$rpart <- stablelearner::stabletree(tree2,data=data,B=100)
     }
 
     if(any(methods2==c("ctree"))){
@@ -236,13 +236,13 @@ stable = function(formula,
       tt = train(formula, data=data,method="ctree")
       tree1 <- partykit::ctree(formula, data=data,
                                control=ctree_control(mincriterion=as.numeric(tt$bestTune)))
-     stablelearner::stabletree(tree1)
+    # stablelearner::stabletree(tree1)
     }
 
     if(any(methods2==c("evtree"))){
       tree <- dtree(formula,data,methods="evtree",samp.method,
                     tuneLength,subset,perc.sub,prune,weights)$evtree.out
-      res$evtree <- stablelearner::stabletree(tree,data=data,B=100)
+      #res$evtree <- stablelearner::stabletree(tree,data=data,B=100)
     }
 
 

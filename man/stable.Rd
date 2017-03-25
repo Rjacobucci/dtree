@@ -6,8 +6,8 @@
 \usage{
 stable(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
   samp.method = "repeatedcv", tuneLength = 3, n.rep = 100,
-  stablelearner = FALSE, subset = FALSE, perc.sub = 0.75,
-  weights = NULL, verbose = FALSE)
+  parallel = FALSE, ncore = detectCores() - 1, stablelearner = FALSE,
+  subset = FALSE, perc.sub = 0.75, weights = NULL)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
@@ -25,6 +25,10 @@ include "cv" and "boot".}
 
 \item{n.rep}{Number of times to replicate each method}
 
+\item{parallel}{Whether to run all reps in parallel}
+
+\item{ncore}{Number of cores to use}
+
 \item{stablelearner}{Whether or not to use the stablelearner package to
 calculate stability}
 
@@ -34,9 +38,17 @@ calculate stability}
 is allocated to test dataset. Defaults to 0.75}
 
 \item{weights}{Optional weights for each case.}
-
-\item{verbose}{}
 }
 \description{
 Main function to calculate stability coefficients
+}
+\examples{
+\dontrun{
+library(MASS) # for boston data
+data(Boston)
+stab.out <- stable(formula=medv ~.,data=Boston,
+            methods=c("rpart"),samp.method="cv",
+            tuneLength=2, n.rep=5, parallel=TRUE)
+stab.out
+}
 }

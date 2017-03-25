@@ -66,30 +66,32 @@ for(i in 1:len){
 
 
 
+breaks <- rep(NA,len)
+for(i in 1:len){
+
+  if(is.null(ret.obj[[i]]$split$breaks)==FALSE){
+    breaks[i] <- ret.obj[[i]]$split$breaks
+  }else{
+    breaks[i] <- NA
+  }
+}
+
+
 return.splits <- list()
 
 if(return.matrix[1,"nsplits"] == 0){
   return.splits <- NA
 }else{
-  ret1 <- partykit:::.list.rules.party(evtree.out)
+  tt = terms(formula,data=data.train)
+  preds <- unlist(attr(tt,"term.labels"))
 
-  pp <- list()
-  for(i in 1:length(ret1)){
-    bb <- gsub("[> <= ]", "", ret1[i])
-    tt <- c(unique(unlist(strsplit(bb, "&"))))
-    pp = unique(c(pp,tt))
-  }
-  ret2 <- unique(pp)
-  ret3 <- data.frame(matrix(NA, length(ret2),2))
+  breaks2 <- breaks[complete.cases(breaks)]
+  vars2 <- vars[complete.cases(vars)]
 
-  for(j in 1:length(ret2)){
-    ret3[j,1] <- stringr::str_extract(ret2[[j]], "[aA-zZ]+")
-    ret3[j,2] <- as.numeric(as.character(stringr::str_extract(ret2[[j]],  "\\d+\\.*\\d*")))
-  }
+  return.splits <- data.frame(cbind(preds[vars2],breaks2))
+  colnames(return.splits) <- c("var","val")
+  return.splits[,2] <- as.numeric(as.character(return.splits[,2]))
 
-  #ret3[,2] <- round(ret3[,2],3)
-  colnames(ret3) <- c("var","val")
-  return.splits <- ret3
 }
 
 

@@ -13,12 +13,10 @@
 #' @param subset Whether to split dataset into training and test sets
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset. Defaults to 0.75
-#' @param prune Whether to prune rpart tree
 #' @param weights Optional weights for each case.
-#' @param verbose
+#' @param verbose Whether to print what method on
 #'
-#'
-#' @importFrom stats cor fitted lm predict terms glm binomial sd
+#' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases
 #' @import party rpart evtree caret
 #' @export
 #'
@@ -45,7 +43,6 @@ dtree = function(formula,
                  tuneLength=3,
                  subset=FALSE,
                  perc.sub=.75,
-                 prune=TRUE,
                  weights,
                  verbose=TRUE){
 

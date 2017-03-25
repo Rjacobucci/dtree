@@ -22,4 +22,8 @@ Suggests: randomForest,
           MASS,
           ISLR,
           matrixStats,
-          stablelearner
+          partykit,
+          stablelearner,
+          plyr,
+          rpart.utils,
+          stringr

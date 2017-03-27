@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(MASS) # for boston data\ndata(Boston)\nout <- dtree(medv ~., data=Boston,methods=c(\"bump\"),bump.rep=50)\nsummary(out)\nplot(out$rpart.out)\nout$bump.matrix\n\nloc <-which(min(out$bump.matrix[,4]) == out$bump.matrix[,4])\nout$bump.list[[loc]]\n\n\nyy = dtree(medv~., Boston,methods=\"ctreePrune\")\n\nyy\nsatTree <- do.call(partykit::ctree,list(formula=medv~., data=Boston))\nctreePrune(medv~., Boston)\n",
+    "created" : 1490636861724.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "465779051",
+    "id" : "7DE78922",
+    "lastKnownWriteTime" : 1490648320,
+    "last_content_update" : 1490648320828,
+    "path" : "C:/Users/jacobucc/Dropbox/dtree_ex.R",
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

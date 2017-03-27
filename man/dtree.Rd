@@ -5,8 +5,8 @@
 \title{Main function for creating different types of decision trees}
 \usage{
 dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
-  samp.method = "repeatedcv", tuneLength = 3, subset = FALSE,
-  perc.sub = 0.75, weights = NULL, verbose = TRUE)
+  samp.method = "repeatedcv", tuneLength = 3, bump.rep = 200,
+  subset = FALSE, perc.sub = 0.75, weights = NULL, verbose = TRUE)
 }
 \arguments{
 \item{formula}{a formula, with a response to left of ~.}
@@ -14,7 +14,9 @@ dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
 \item{data}{Data frame to run models on}
 
 \item{methods}{Which tree methods to use. Defaults:
-lm, rpart, ctree, evtree. Also can use "rf" for random forests}
+lm, rpart, ctree, evtree. Also can use "rf" for random forests.
+Also a FDR pruning method for ctree termed "ctreePrune".
+Finally bumping is implemented as methods="bump".}
 
 \item{samp.method}{Sampling method. Refer to caret package trainControl()
 documentation. Default is repeated cross-validation. Other options
@@ -23,6 +25,8 @@ include "cv" and "boot".}
 \item{tuneLength}{Number of tuning parameters to try. Applies to train().
 Can also be specified as a vector, with order corresponding to the
 order specified in the methods argument.}
+
+\item{bump.rep}{Number of repetitions for bumping}
 
 \item{subset}{Whether to split dataset into training and test sets}
 

@@ -1,7 +1,7 @@
 Package: dtree
 Type: Package
 Title: Decision Trees
-Version: 0.1.1
+Version: 0.1.2
 Author: Ross Jacobucci
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Combines various decision tree algorithms, plus both
@@ -16,13 +16,13 @@ RoxygenNote: 6.0.1
 Depends: rpart,
          party,
          evtree,
+         partykit,
          caret
 Suggests: randomForest,
           tree,
           MASS,
           ISLR,
           matrixStats,
-          partykit,
           plyr,
           rpart.utils,
           stringr

@@ -3,13 +3,16 @@
 #' @param formula a formula, with a response to left of ~.
 #' @param data Data frame to run models on
 #' @param methods Which tree methods to use. Defaults:
-#'        lm, rpart, ctree, evtree. Also can use "rf" for random forests
+#'        lm, rpart, ctree, evtree. Also can use "rf" for random forests.
+#'        Also a FDR pruning method for ctree termed "ctreePrune".
+#'        Finally bumping is implemented as methods="bump".
 #' @param samp.method Sampling method. Refer to caret package trainControl()
 #'        documentation. Default is repeated cross-validation. Other options
 #'        include "cv" and "boot".
 #' @param tuneLength Number of tuning parameters to try. Applies to train().
 #'        Can also be specified as a vector, with order corresponding to the
 #'        order specified in the methods argument.
+#' @param bump.rep Number of repetitions for bumping
 #' @param subset Whether to split dataset into training and test sets
 #' @param perc.sub What fraction of data to put into train dataset. 1-frac.sub
 #'        is allocated to test dataset. Defaults to 0.75
@@ -17,7 +20,7 @@
 #' @param verbose Whether to print what method on
 #'
 #' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases
-#' @import party rpart evtree caret
+#' @import rpart evtree caret partykit
 #' @export
 #'
 #' @examples
@@ -41,6 +44,7 @@ dtree = function(formula,
                  methods=c("lm","rpart","tree","ctree","evtree"),
                  samp.method="repeatedcv",
                  tuneLength=3,
+                 bump.rep=200,
                  subset=FALSE,
                  perc.sub=.75,
                  weights=NULL,
@@ -192,6 +196,43 @@ dtree = function(formula,
     ret$rf.train <- ret5$rf.train
   }
 
+
+  # ----------------------------------------------------
+
+  # Bumping
+
+  # ----------------------------------------------------
+
+
+  if(any(methods=="bump")){
+    if(verbose==TRUE) cat("Currently running bumping with",bump.rep,"repetitions")
+    ret6 <- bump_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric,bump.rep)
+    #return.matrix["bump",] <- ret6$vec
+    ret$bump.matrix <- ret6$bump.matrix
+    ret$bump.list <- ret6$bump.list
+
+    loc <-which(min(ret$bump.matrix[,4]) == ret$bump.matrix[,4])
+    ret$BestMod <- ret$bump.list[[loc]]
+  }
+
+
+  # ----------------------------------------------------
+
+  # CtreePrune
+
+  # ----------------------------------------------------
+  if(any(methods == "ctreePrune")){
+    if(verbose==TRUE) cat("Currently running ctreePrune")
+   # formula2 <- terms(formula,data=data.train)
+    #print(formula2)
+   # print(formula)
+    #print(formula2)
+    #ret77 <- do.call(partykit::ctree,list(formula=medv~., data=Boston))
+    ret7 <- ctreePrune(formula=formula, data=data.train)
+    #return.matrix["ctree",] <- ret3$vec
+    ret$ctreePrune.out <- ret7
+
+  }
 
 
   ret$response.type <- class.response

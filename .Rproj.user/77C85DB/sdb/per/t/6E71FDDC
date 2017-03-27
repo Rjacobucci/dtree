@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "##############################################################################\n### This function collect information about nodes for trees grown using Ctree\n##############################################################################\nDFtreeInfo<-function(fit) {\n  \n  ############################################\n  ### Calculates IDs and left and right nodes\n  ############################################\n  #library(partykit)\n  nid <- nodeids(fit)\n  datNo <- nodeapply(fit, ids=nid, function(n) {\n    #\n    if (is.null(kids_node(n))) {\n      out <- data.frame(node= nodeids(n)[1],\n                        left=NA,\n                        right=NA)\n    }\n    if (!is.null(kids_node(n))) {\n      out <- data.frame(node= nodeids(n)[1],\n                        left=nodeids(kids_node(n)[[1]])[1],\n                        right=nodeids(kids_node(n)[[2]])[1])\n    }\n    out\n  })\n  datNo <- do.call(\"rbind\",datNo)\n  \n  \n  \n  #########################################\n  ### Calculates the name of the covariates\n  ### used in each split\n  #########################################\n  datNo$varName <- NA\n  \n  if (!length(fit)==0) {\n    tmpNames <- names(data_party(fit))\n    temp<-nodeapply(fit,nid, FUN = function(n) {\n      tmp <- n$split$varid\n      tmpNames[tmp]\n    })\n    temp<-unlist(temp)\n    wher <- datNo$node %in% as.numeric(names(temp))\n    datNo$varName[wher]<-temp\n  }\n\n  \n  \n  ###############################\n  ### extract pvalues from nodes\n  ###############################\n\n  if (!dim(datNo)[1]==1) {\n    temp<-nodeapply(fit, ids = nodeids(fit), function(n) info_node(n)$p.value)\n    pvalues<-sapply(1:length(temp),function(i){\n      if (is.null(temp[[i]])) out<-NA else out<-as.numeric(temp[[i]])\n    })\n    datNo$pvalue<-pvalues\n  }\n  \n  if (dim(datNo)[1]==1) {\n    datNo$pvalue<-NA\n  } \n  \n  \n  ###############################\n  ### Defines terminal nodes\n  ###############################\n  temp<-nodeids(fit,terminal=TRUE)\n  wher <- datNo$node %in% temp\n  datNo$terminal[wher]<-TRUE\n  datNo$terminal[!wher]<-FALSE\n  \n  \n  ###############################\n  ### Defines pruneYN column\n  ###############################\n  datNo$pruneYN<-FALSE\n  \n  \n  ###############################\n  ### Defines FDRsigYN column\n  ###############################\n  datNo$FDRsigYN<-NA\n  \n  \n  ##########################################\n  #### Calculates identity of parent nodes\n  ##########################################\n  datNo$parent<-NA\n  for (i in datNo$node) {\n    tmpil<-datNo$left[i]\n    tmpir<-datNo$right[i]\n    datNo$parent[tmpil]<-i\n    datNo$parent[tmpir]<-i\n  }\n  \n  \n  \n  datNo\n  \n}",
+    "created" : 1490639940115.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4086682002",
+    "id" : "6E71FDDC",
+    "lastKnownWriteTime" : 1471018850,
+    "last_content_update" : 1471018850,
+    "path" : "C:/Users/jacobucc/AppData/Local/Temp/Temp1_mmc1.zip/DFtreeInfo.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

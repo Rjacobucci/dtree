@@ -228,9 +228,10 @@ dtree = function(formula,
    # print(formula)
     #print(formula2)
     #ret77 <- do.call(partykit::ctree,list(formula=medv~., data=Boston))
-    ret7 <- ctreePrune(formula=formula, data=data.train)
-    #return.matrix["ctree",] <- ret3$vec
-    ret$ctreePrune.out <- ret7
+    ret7 <- ctreePrune_ret(formula,data.train,data.test,class.response,subset,response)
+    return.matrix["ctreePrune",] <- ret7$vec
+    ret$ctreePrune.out <- ret7$ctreePrune.ret
+    ret$ctreePrune.splits <- ret7$return.splits
 
   }
 

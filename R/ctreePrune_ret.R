@@ -1,0 +1,123 @@
+
+ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,response){
+
+
+  ret <- list()
+
+  if(class.response == "numeric" | class.response == "integer"){
+    return.matrix <- matrix(NA,1,7)
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","rmse.samp",
+                                 "rsq.samp","rmse.test","rsq.test")
+  }else{
+    return.matrix <- matrix(NA,1,7)
+    colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
+                                 "accuracy.samp","auc.test","accuracy.test")
+
+  }
+
+
+
+  out <- ctreePrune(formula=formula, data=data.train)
+  ctreePrune.out <- ctreePrune.ret <- out$tree
+
+  #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
+  return.matrix[1,"nsplits"] <- max(fitted(ctreePrune.out)[,1]) - length(unique(fitted(ctreePrune.out)[,1]))
+  #return.matrix[1,"fit.cv"] <- cp[min.error,"xerror"]
+
+
+
+  #depth(ctreePrune.out$node)
+
+  ret.obj <- as.list(ctreePrune.out$node)
+  len <- length(ret.obj)
+
+  vars <- rep(NA,len)
+  for(i in 1:len){
+
+    if(is.null(ret.obj[[i]]$split$varid)==FALSE){
+      vars[i] <- ret.obj[[i]]$split$varid
+    }else{
+      vars[i] <- NA
+    }
+  }
+
+
+  breaks <- rep(NA,len)
+  for(i in 1:len){
+
+    if(is.null(ret.obj[[i]]$split$breaks)==FALSE){
+      breaks[i] <- ret.obj[[i]]$split$breaks
+    }else{
+      breaks[i] <- NA
+    }
+  }
+
+
+  return.splits <- list()
+
+  if(return.matrix[1,"nsplits"] == 0){
+    return.splits <- NA
+  }else{
+    tt = terms(formula,data=data.train)
+    preds <- unlist(attr(tt,"term.labels"))
+
+    breaks2 <- breaks[complete.cases(breaks)]
+    vars2 <- vars[complete.cases(vars)]
+
+    return.splits <- data.frame(cbind(preds[vars2],breaks2))
+    colnames(return.splits) <- c("var","val")
+    return.splits[,2] <- as.numeric(as.character(return.splits[,2]))
+
+  }
+
+
+
+  vars2 <- vars[is.na(vars)==FALSE]
+  vars3 <- length(unique(vars2))
+
+  ctreePrune.ret <- ctreePrune.out
+  #attributes(ctreePrune.out)
+
+
+  return.matrix[1,"nvar"] <- vars3
+
+  return.matrix[1,"nodes"] <- length(unique(fitted(ctreePrune.out)[,1]))
+
+
+
+
+
+  if(class.response == "numeric" | class.response == "integer"){
+    #which(train.out$results[,"cp"] == train.out$bestTune)
+
+    #return.matrix[1,"rmse.samp"] <- train.out$results[ind,"RMSE"]
+    return.matrix[1,"rmse.samp"] <- sqrt(mean((data.train[,response] - predict(ctreePrune.out))^2))
+    return.matrix[1,"rsq.samp"] <- (cor(data.train[,response],predict(ctreePrune.out)))**2
+   #return.matrix[1,"rsq.samp"] <- train.out$results[ind,"Rsquared"]
+
+    if(subset==FALSE){
+      return.matrix[1,"rmse.test"] <- NA
+      return.matrix[1,"rsq.test"] <- NA
+    }else{
+      return.matrix[1,"rmse.test"] <- sqrt(mean((data.test[,response] - predict(ctreePrune.out,data.test))^2))
+      return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(ctreePrune.out,data.test)))**2
+    }
+  }else{
+    return.matrix[1,"auc.samp"] <- pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
+    return.matrix[1,"accuracy.samp"] <- caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
+
+    if(subset==FALSE){
+     # return.matrix[1,"auc.test"] <- NA
+    }else{
+    #  return.matrix[1,"auc.test"] <- NA
+    }
+  }
+
+
+
+
+  ret$return.splits <- return.splits
+  ret$vec <- return.matrix
+  ret$ctreePrune.ret <- ctreePrune.ret
+  return(ret)
+}

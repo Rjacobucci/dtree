@@ -58,7 +58,12 @@ return.matrix[1,"nodes"] <- length(vars[vars == "<leaf>"])
 return.splits <- list()
 
 if(cp[min.error,"nsplit"] == 0){
-  return.splits <- NA
+  return.splits <- as.data.frame(matrix(NA,1,2))
+  colnames(return.splits) <- c("var","val")
+  return.splits[1,1] <- "no split"
+  return.splits[1,2] <- 0
+  return.splits[1,1] <- as.character(return.splits[1,1])
+  return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
 }else{
   hh <- rpart.utils::rpart.subrules.table(rpart.out)
 
@@ -100,6 +105,17 @@ if(class.response == "numeric" | class.response == "integer"){
   }
 }
 
+if(return.matrix[1,2] > 0){
+  rtree = rpart.utils::rpart.subrules.table(rpart.out)[1,2:5]
+  rtree2 <- matrix(rtree[is.na(rtree)==FALSE],1,2)
+  colnames(rtree2) <- c("var","val")
+  rtree2[,1] <- as.character(rtree2[,1])
+  rtree2[,2] <- round(as.numeric(as.character(rtree2[,2])),3)
+}else{
+  rtree2 <- NA
+}
+
+ret$firstSplit <- rtree2
 ret$return.splits <- return.splits
 ret$vec <- return.matrix
 ret$rpart.ret <- rpart.ret

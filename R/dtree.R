@@ -20,6 +20,7 @@
 #' @param verbose Whether to print what method on
 #'
 #' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases
+#' @importFrom party nodes where
 #' @import rpart evtree caret partykit
 #' @export
 #'
@@ -44,12 +45,12 @@ dtree = function(formula,
                  methods=c("lm","rpart","tree","ctree","evtree"),
                  samp.method="repeatedcv",
                  tuneLength=3,
-                 bump.rep=200,
+                 bump.rep=50,
                  subset=FALSE,
                  perc.sub=.75,
                  weights=NULL,
                  verbose=TRUE){
-
+#options(warn=-1)
   if(is.null(weights)==FALSE){
     stop("weights are currently not implemented")
   }
@@ -114,7 +115,9 @@ dtree = function(formula,
 
   }
 
-
+  firstSplit <- matrix(NA,length(methods),2)
+  rownames(firstSplit) <- methods
+  colnames(firstSplit) <- c("var","val")
   # -----------------------------------------------------------------
 
   # Linear (Logistic) Regression
@@ -143,11 +146,12 @@ dtree = function(formula,
 
   if(any(methods=="rpart")){
     if(verbose==TRUE) cat("Currently running",tune.rpart, "rpart models\n")
-  ret1 <- rpart_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric)
+  ret1 <- suppressWarnings(rpart_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric))
   return.matrix["rpart",] <- ret1$vec
   ret$rpart.out <- ret1$rpart.ret
   ret$rpart.train <- ret1$rpart.train
   ret$rpart.splits <- ret1$return.splits
+  firstSplit["rpart",] <- as.matrix(ret1$firstSplit)
 
 
   }
@@ -164,6 +168,7 @@ dtree = function(formula,
     ret$ctree.out <- ret3$ctree.ret
     ret$ctree.train <- ret3$ctree.train
     ret$ctree.splits <- ret3$return.splits
+    firstSplit["ctree",] <- as.matrix(ret3$firstSplit)
   }
 
 
@@ -180,6 +185,7 @@ dtree = function(formula,
     ret$evtree.out <- ret4$evtree.ret
     ret$evtree.train <- ret4$evtree.train
     ret$evtree.splits <- ret4$return.splits
+    firstSplit["evtree",] <- as.matrix(ret4$firstSplit)
   }
 
   #----------------------------------------------------
@@ -205,14 +211,21 @@ dtree = function(formula,
 
 
   if(any(methods=="bump")){
-    if(verbose==TRUE) cat("Currently running bumping with",bump.rep,"repetitions")
-    ret6 <- bump_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric,bump.rep)
-    #return.matrix["bump",] <- ret6$vec
+    if(verbose==TRUE) cat("Currently running bumping with",bump.rep,"repetitions\n")
+    ret6 <- suppressWarnings(bump_ret(formula, data.train,data.test,samp.method,tuneLength=tune.rpart,subset, class.response,response,Metric,bump.rep))
+    return.matrix["bump",] <- ret6$vec
     ret$bump.matrix <- ret6$bump.matrix
     ret$bump.list <- ret6$bump.list
+    ret$bump.BestMode <- ret6$BestMod
+    ret$bump.splits <- ret6$return.splits
+    firstSplit["bump",] <- as.matrix(ret6$firstSplit)
 
-    loc <-which(min(ret$bump.matrix[,4]) == ret$bump.matrix[,4])
-    ret$BestMod <- ret$bump.list[[loc]]
+
+   # if(ret$BestMod$frame$var == "<leaf>"){
+   #   ret$bump.matrix[1,"nvar"] <- 0
+   #   ret$bump.matrix[1,"nodes"] <- 1
+   #   ret$bump.matrix[1,"nsplits"] <- 0
+   # }
   }
 
 
@@ -232,10 +245,11 @@ dtree = function(formula,
     return.matrix["ctreePrune",] <- ret7$vec
     ret$ctreePrune.out <- ret7$ctreePrune.ret
     ret$ctreePrune.splits <- ret7$return.splits
+    firstSplit["ctreePrune",] <- as.matrix(ret7$firstSplit)
 
   }
 
-
+  ret$firstSplit <- firstSplit
   ret$response.type <- class.response
   ret$return.matrix <- return.matrix
   ret$call <- match.call()

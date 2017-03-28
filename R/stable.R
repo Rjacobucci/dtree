@@ -9,8 +9,10 @@
 #'        include "cv" and "boot".
 #' @param tuneLength Number of tuning parameters to try. Applies to train()
 #' @param n.rep Number of times to replicate each method
+#' @param bump.rep Number of repetitions for bumping
 #' @param parallel Whether to run all reps in parallel
 #' @param ncore Number of cores to use
+#' @param roundVal How much to round cut points when calculating stability
 #' @param stablelearner Whether or not to use the stablelearner package to
 #'        calculate stability
 #' @param subset Whether to subset
@@ -37,8 +39,10 @@ stable = function(formula,
                  samp.method="repeatedcv",
                  tuneLength=3,
                  n.rep=100,
+                 bump.rep=50,
                  parallel=FALSE,
                  ncore=detectCores() - 1,
+                 roundVal = 1,
                  stablelearner=FALSE,
                  subset=FALSE,
                  perc.sub=.75,
@@ -57,7 +61,7 @@ stable = function(formula,
         print(i)
         ids <- sample(nrow(data),nrow(data),replace=TRUE)
         out[[i]] <- dtree(formula,data[ids,],methods,samp.method,
-                          tuneLength,subset,perc.sub,weights,verbose=FALSE)
+                          tuneLength,bump.rep,subset,perc.sub,weights,verbose=FALSE)
 
         out2[[i]] <- out[[i]]$return.matrix
       }
@@ -77,10 +81,11 @@ stable = function(formula,
       no_cores <- detectCores() - 1
       cl <- makeCluster(no_cores)
       e <- new.env()
-      clusterExport(cl, c("formula","methods","samp.method","tuneLength","subset","perc.sub","weights"),envir = e)
+      clusterExport(cl, c("formula","methods","samp.method","tuneLength","bump.rep","subset","perc.sub","weights"),envir = e)
       par.fun <- function(data){
         library(dtree)
-        dtree(formula,data,methods,samp.method,tuneLength,subset,perc.sub,weights)
+        dtree(formula,data,methods,samp.method,
+              tuneLength,bump.rep,subset,perc.sub,weights)
       }
       out <- list()
       out <- parLapply(cl, data.rep,par.fun)
@@ -100,6 +105,9 @@ stable = function(formula,
 
     ret.mean <- matrix(ret.mean,length(methods),7)
     ret.var <- matrix(ret.var,length(methods),7)
+
+    stability <- matrix(NA,1,length(methods))
+    colnames(stability) <- methods
 
     row.names(ret.mean) <- methods
     row.names(ret.var) <- methods
@@ -125,6 +133,7 @@ stable = function(formula,
       where.ctree <- list()
       for(i in 1:n.rep){
         hh <- out[[i]]$ctree.splits
+        hh[,2] <- round(hh[,2],roundVal)
         tab <- table(hh[,1])
         where.ctree[[i]] <- hh
 
@@ -142,7 +151,7 @@ stable = function(formula,
       }else{
         res$where.ctree <- sapply(split(nn, nn$var),table)
       }
-
+      stability[,"ctree"] <- 1-length(unique(where.ctree))/n.rep
     }
 
 
@@ -151,8 +160,15 @@ stable = function(formula,
       colnames(var.count) <- preds
       where.rpart <- list()
 
+
+
+
       for(i in 1:n.rep){
         hh <- out[[i]]$rpart.splits
+      #  if(is.na(hh)){
+       #
+       # }
+        hh[,2] <- round(hh[,2],roundVal)
         tab <- table(hh[,1])
         where.rpart[[i]] <- hh
 
@@ -170,7 +186,7 @@ stable = function(formula,
       }else{
         res$where.rpart <- sapply(split(nn, nn$var),table)
       }
-
+      stability[,"rpart"] <- 1-length(unique(where.rpart))/n.rep
     }
 
 
@@ -182,6 +198,7 @@ stable = function(formula,
 
       for(i in 1:n.rep){
         hh <- out[[i]]$evtree.splits
+        hh[,2] <- round(hh[,2],roundVal)
         tab <- table(hh[,1])
         where.evtree[[i]] <- hh
 
@@ -201,10 +218,71 @@ stable = function(formula,
       }else{
         res$where.evtree <- sapply(split(nn, nn$var),table)
       }
+      stability[,"evtree"] <- 1-length(unique(where.evtree))/n.rep
     }
 
 
+    if(any(methods==c("ctreePrune"))){
+      var.count <- matrix(NA,n.rep,length(preds))
+      colnames(var.count) <- preds
+      where.ctreePrune <- list()
 
+      for(i in 1:n.rep){
+        hh <- out[[i]]$ctreePrune.splits
+        hh[,2] <- round(hh[,2],roundVal)
+        tab <- table(hh[,1])
+        where.ctreePrune[[i]] <- hh
+
+
+        for(j in 1:length(preds)){
+          var.count[i,preds[j]] <- tab[preds[j]]
+          if(is.na(var.count[i,preds[j]]==TRUE)) var.count[i,preds[j]] <- 0
+        }
+      }
+
+      counts.mean["ctreePrune",] <- colMeans(var.count)
+      counts.var["ctreePrune",] <- round(matrixStats::colVars(var.count),2)
+      nn <- plyr::ldply(where.ctreePrune)
+      nn[,1] <- as.character(nn[,1])
+      if(length(unique(nn[,1])) == 1){
+        res$where.ctreePrune <- table(nn)
+      }else{
+        res$where.ctreePrune <- sapply(split(nn, nn$var),table)
+      }
+      stability[,"ctreePrune"] <- 1-length(unique(where.ctreePrune))/n.rep
+    }
+
+
+    if(any(methods==c("bump"))){
+      var.count <- matrix(NA,n.rep,length(preds))
+      colnames(var.count) <- preds
+      where.bump <- list()
+
+      for(i in 1:n.rep){
+        hh <- out[[i]]$bump.splits
+        hh[,2] <- round(hh[,2],roundVal)
+        tab <- table(hh[,1])
+        where.bump[[i]] <- hh
+
+        for(j in 1:length(preds)){
+          var.count[i,preds[j]] <- tab[preds[j]]
+          if(is.na(var.count[i,preds[j]]==TRUE)) var.count[i,preds[j]] <- 0
+        }
+      }
+
+      counts.mean["bump",] <- colMeans(var.count)
+      counts.var["bump",] <- round(matrixStats::colVars(var.count),2)
+      nn <- plyr::ldply(where.bump)
+      if(length(unique(nn[,1])) == 1){
+        res$where.bump <- table(nn)
+      }else{
+        res$where.bump <- sapply(split(nn, nn$var),table)
+      }
+      stability[,"bump"] <- 1-length(unique(where.bump))/n.rep
+    }
+
+
+    res$stability <- stability
     res$counts.mean <- counts.mean
     res$counts.var <- counts.var
     res$means <- round(ret.mean,3)

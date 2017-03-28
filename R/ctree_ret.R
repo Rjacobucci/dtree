@@ -75,7 +75,12 @@ return.matrix[1,"nodes"] <- length(unique(nodes))
 return.splits <- list()
 
 if(return.matrix[1,"nsplits"] == 0){
-  return.splits <- NA
+  return.splits <- as.data.frame(matrix(NA,1,2))
+  colnames(return.splits) <- c("var","val")
+  return.splits[1,1] <- "no split"
+  return.splits[1,2] <- 0
+  return.splits[1,1] <- as.character(return.splits[1,1])
+  return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
 }else{
 
   hh <- CtreePathFunc(ctree.out,data=data.train)
@@ -133,6 +138,7 @@ if(class.response == "numeric" | class.response == "integer"){
 
 
 ret$return.splits <- return.splits
+ret$firstSplit <- return.splits[1,]
 ret$vec <- return.matrix
 ret$ctree.ret <- ctree.ret
 ret$ctree.train <- train.out

@@ -35,7 +35,7 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
   for(i in 1:len){
 
     if(is.null(ret.obj[[i]]$split$varid)==FALSE){
-      vars[i] <- ret.obj[[i]]$split$varid
+      vars[i] <- ret.obj[[i]]$split$varid -1
     }else{
       vars[i] <- NA
     }
@@ -56,7 +56,12 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
   return.splits <- list()
 
   if(return.matrix[1,"nsplits"] == 0){
-    return.splits <- NA
+    return.splits <- as.data.frame(matrix(NA,1,2))
+    colnames(return.splits) <- c("var","val")
+    return.splits[1,1] <- "no split"
+    return.splits[1,2] <- 0
+    return.splits[1,1] <- as.character(return.splits[1,1])
+    return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
   }else{
     tt = terms(formula,data=data.train)
     preds <- unlist(attr(tt,"term.labels"))
@@ -143,6 +148,7 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
 
   ret$return.splits <- return.splits
+  ret$firstSplit <- return.splits[1,]
   ret$vec <- return.matrix
   ret$ctreePrune.ret <- ctreePrune.ret
   return(ret)

@@ -6,8 +6,9 @@
 \usage{
 stable(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
   samp.method = "repeatedcv", tuneLength = 3, n.rep = 100,
-  parallel = FALSE, ncore = detectCores() - 1, stablelearner = FALSE,
-  subset = FALSE, perc.sub = 0.75, weights = NULL)
+  bump.rep = 50, parallel = FALSE, ncore = detectCores() - 1,
+  roundVal = 1, stablelearner = FALSE, subset = FALSE, perc.sub = 0.75,
+  weights = NULL)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}
@@ -25,9 +26,13 @@ include "cv" and "boot".}
 
 \item{n.rep}{Number of times to replicate each method}
 
+\item{bump.rep}{Number of repetitions for bumping}
+
 \item{parallel}{Whether to run all reps in parallel}
 
 \item{ncore}{Number of cores to use}
+
+\item{roundVal}{How much to round cut points when calculating stability}
 
 \item{stablelearner}{Whether or not to use the stablelearner package to
 calculate stability}

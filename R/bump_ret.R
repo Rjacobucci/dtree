@@ -2,6 +2,7 @@
 bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,class.response, response,Metric,bump.rep){
 
   ret <- list()
+  return.splits <- list()
 
   if(class.response == "numeric" | class.response == "integer"){
     return.matrix <- matrix(NA,1,7)
@@ -55,10 +56,15 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
 
     return.matrix[1,"nodes"] <- length(vars[vars == "<leaf>"])
 
-    return.splits <- list()
+
 
     if(cp[min.error,"nsplit"] == 0){
-      return.splits <- NA
+      return.splits <- as.data.frame(matrix(NA,1,2))
+      colnames(return.splits) <- c("var","val")
+      return.splits[1,1] <- "no split"
+      return.splits[1,2] <- 0
+      return.splits[1,1] <- as.character(return.splits[1,1])
+      return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
     }else{
       hh <- rpart.utils::rpart.subrules.table(bump.out)
 
@@ -68,7 +74,7 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
       hh3[,1] <- as.character(hh3[,1])
       hh3[,2] <- round(as.numeric(as.character(hh3[,2])),3)
       row.names(hh3) <- c()
-      return.splits <- hh3
+      return.splits[[i]] <- hh3
     }
 
 
@@ -104,10 +110,27 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
 
   }
 
+  if(class.response == "numeric" | class.response == "integer"){
+    loc <-which(min(bump.matrix[,4]) == bump.matrix[,4])[1]
+  }else{
+    loc <-which(max(bump.matrix[,4]) == bump.matrix[,4])[1]
+  }
 
+  if(bump.matrix[loc,2] > 0){
+    rtree = rpart.utils::rpart.subrules.table(bump.list[[loc]])[1,2:5]
+    rtree2 <- matrix(rtree[is.na(rtree)==FALSE],1,2)
+    colnames(rtree2) <- c("var","val")
+    rtree2[,1] <- as.character(rtree2[,1])
+    rtree2[,2] <- round(as.numeric(as.character(rtree2[,2])),3)
+  }else{
+    rtree2 <- NA
+  }
 
-
-
+  ret$firstSplit <- rtree2
+  BestMod <- ret$bump.list[[loc]]
+  ret$BestMod <- BestMod
+  ret$return.splits <- return.splits[[loc]]
+  ret$vec <- bump.matrix[loc,]
   ret$bump.list <- bump.list
   ret$bump.matrix <- bump.matrix
   return(ret)

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(MASS) # for boston data\ndata(Boston)\nout <- dtree(medv ~., data=Boston,methods=c(\"bump\"),bump.rep=50)\nsummary(out)\nplot(out$rpart.out)\nout$bump.matrix\n\nloc <-which(min(out$bump.matrix[,4]) == out$bump.matrix[,4])\nout$bump.list[[loc]]\n\n\nyy = dtree(medv~., Boston,methods=c(\"ctreePrune\"))\nsummary(yy)\nyy\nsatTree <- do.call(partykit::ctree,list(formula=medv~., data=Boston))\nyy = ctreePrune(medv~., Boston)\n\n\n\n\n\n\n\n\n\n\nlibrary(ISLR)\ndata(Default)\nDefault=Default[1:300,]\n\nyy = dtree(default ~ ., data=Default,methods=c(\"ctreePrune\",\"ctree\"),samp.method=\"boot\")\nsummary(yy)\n\n\nconfusionMatrix(Default$default,predict(yy$ctreePrune.out))$overall[\"Accuracy\"]\nlibrary(pROC)\n?auc\nauc(Default$default,predict(yy$ctreePrune.out,type=\"prob\")[,1])\n",
+    "created" : 1490654213301.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4002418704",
+    "id" : "1CF75ABD",
+    "lastKnownWriteTime" : 1490670314,
+    "last_content_update" : 1490670314997,
+    "path" : "C:/Users/RJacobucci/Dropbox/dtree_ex.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

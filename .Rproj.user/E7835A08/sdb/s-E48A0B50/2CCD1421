@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(mice)\nlibrary(MASS) # for boston data\ndata(Boston)\n\nnames(Boston)[14] <- \"y\"\ninsert_nas <- function(data,perc) {\n  data2 = data[,!names(data) %in% c(\"y\")]\n\n  for(j in 1:ncol(data2)){\n    len <- length(data2[,j])\n    i <- sample(1:len, floor(perc*len))\n    data2[i,j] <- NA\n  }\n  data.frame(y=data$y,data2)\n}\n\nBoston2 <- insert_nas(Boston,.2)\n\n\n\n\nout <- train(y ~ ., Boston2,method=\"evtree\",na.action=na.pass,tuneLength=2)\nstr(out$finalModel)\npredict(out$finalModel)\nplot(out$finalModel)\n\n\nBoston$chas <- as.factor(Boston$chas)\nBoston2 <- Boston[,!names(Boston) %in% c(\"medv\")]\ndf2 <- as.data.frame(sapply(Boston2, insert_nas))\ncolMeans(is.na(df2))\ndf2$chas <- as.factor(df2$chas)\n\n\nout = mice(df2,m=1,\"mean\")\ndf = complete(out)\n\n\nout2 = mice(df2,m=1,defaultMethod=c(\"norm.predict\",\"logreg\",\"polyreg\"))\ndf = complete(out2)\n\nout3 = mice(df2,m=1,defaultMethod=c(\"cart\",\"cart\",\"cart\"))\n\nout4 = mice(df2,m=1,defaultMethod=c(\"rf\",\"rf\",\"rf\"))\n",
+    "created" : 1490817235936.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4274216356",
+    "id" : "2CCD1421",
+    "lastKnownWriteTime" : 1490818921,
+    "last_content_update" : 1490818921453,
+    "path" : "~/GitHub/diss_paper/analyses/mices_ex.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

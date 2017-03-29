@@ -31,7 +31,7 @@ if(class.response == "numeric" | class.response == "integer"){
 }
 
 train.out <- train(formula,data.train,method="ctree",tuneLength=tuneLength,
-                   trControl=ctrl,metric=Metric)
+                   trControl=ctrl,metric=Metric,na.action=na.pass)
 ctree.out <- train.out$finalModel
 
 

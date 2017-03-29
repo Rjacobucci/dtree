@@ -39,7 +39,7 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
     set.seed(i)
     ids <- sample(nrow(data.train),nrow(data.train),replace=TRUE)
     train.out <- train(formula,data.train[ids,],method="rpart",tuneLength=tuneLength,
-                       trControl=ctrl,metric=Metric)
+                       trControl=ctrl,metric=Metric,na.action=na.pass)
     bump.list[[i]] <- train.out$finalModel
     bump.out <- train.out$finalModel
     bump.ret <- bump.out

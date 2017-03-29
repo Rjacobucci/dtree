@@ -59,12 +59,13 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
 
 
     if(cp[min.error,"nsplit"] == 0){
-      return.splits <- as.data.frame(matrix(NA,1,2))
-      colnames(return.splits) <- c("var","val")
-      return.splits[1,1] <- "no split"
-      return.splits[1,2] <- 0
-      return.splits[1,1] <- as.character(return.splits[1,1])
-      return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
+      return.splits2 <- as.data.frame(matrix(NA,1,2))
+      colnames(return.splits2) <- c("var","val")
+      return.splits2[1,1] <- "no split"
+      return.splits2[1,2] <- 0
+      return.splits2[1,1] <- as.character(return.splits2[1,1])
+      return.splits2[1,2] <- as.numeric(as.character(return.splits2[1,2]))
+      return.splits[[i]] <- return.splits2
     }else{
       hh <- rpart.utils::rpart.subrules.table(bump.out)
 
@@ -122,14 +123,16 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
     colnames(rtree2) <- c("var","val")
     rtree2[,1] <- as.character(rtree2[,1])
     rtree2[,2] <- round(as.numeric(as.character(rtree2[,2])),3)
+    ret$return.splits <- return.splits[[loc]]
   }else{
     rtree2 <- NA
+    ret$return.splits <- return.splits
   }
+
 
   ret$firstSplit <- rtree2
   BestMod <- ret$bump.list[[loc]]
   ret$BestMod <- BestMod
-  ret$return.splits <- return.splits[[loc]]
   ret$vec <- bump.matrix[loc,]
   ret$bump.list <- bump.list
   ret$bump.matrix <- bump.matrix

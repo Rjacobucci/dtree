@@ -51,6 +51,7 @@ stable = function(formula,
   res <- list()
   out <- list()
   out2 <- list()
+  firSplit <- list()
 
   if(stablelearner==FALSE){
 
@@ -64,6 +65,7 @@ stable = function(formula,
                           tuneLength,bump.rep,subset,perc.sub,weights,verbose=FALSE)
 
         out2[[i]] <- out[[i]]$return.matrix
+        firSplit[[i]] <- out[[i]]$firstSplit
       }
       ret <- array(NA, dim=c(n.rep,length(methods),ncol(out2[[1]])))
 
@@ -92,9 +94,10 @@ stable = function(formula,
       stopCluster(cl)
       out2 <- list()
       ret <- array(NA, dim=c(n.rep,length(methods),ncol(out[[1]]$return.matrix)))
-
+      firSplit <- list()
       for(i in 1:n.rep){
         out2[[i]] <- out[[i]]$return.matrix
+        firSplit[[i]] <- out[[i]]$firstSplit
         ret[i,,] <- out2[[i]]
       }
     }
@@ -153,6 +156,14 @@ stable = function(formula,
       }
       stability[,"ctree"] <- 1-length(unique(where.ctree))/n.rep
     }
+
+    tt.array <- simplify2array(firSplit)
+    firstSplit <- list()
+    for(i in 1:length(methods)){
+     firstSplit[[methods[i]]] <-  table(tt.array[methods[i],,][1,])
+    }
+
+
 
 
     if(any(methods==c("rpart"))){
@@ -281,7 +292,7 @@ stable = function(formula,
       stability[,"bump"] <- 1-length(unique(where.bump))/n.rep
     }
 
-
+    res$firstSplit <- firstSplit
     res$stability <- stability
     res$counts.mean <- counts.mean
     res$counts.var <- counts.var

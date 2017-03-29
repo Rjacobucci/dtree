@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(MASS) # for boston data\ndata(Boston)\n\nout <- dtree(medv ~., data=Boston,methods=c(\"bump\"),bump.rep=50)\nsummary(out)\nplot(out$rpart.out)\nout$bump.matrix\n\nloc <-which(min(out$bump.matrix[,4]) == out$bump.matrix[,4])\nout$bump.list[[loc]]\n\n\nyy = dtree(medv~., Boston,methods=c(\"ctree\",\"rpart\"),tuneLength=2,bump.rep=10)\nsummary(yy)\nyy\n\n\nsatTree <- do.call(partykit::ctree,list(formula=medv~., data=Boston))\nyy = ctreePrune(medv~., Boston)\n\nna.rm(rpart.utils::rpart.subrules.table(yy$rpart.out)[1,2:5])\n\nctreePrune.out = yy$ctreePrune.out\n\n\nyy <- list();tt <- list()\nfor(i in 1:3){\n  yy[[i]] <- dtree(medv~., Boston,methods=c(\"ctree\",\"rpart\"),tuneLength=2,bump.rep=10)\n  tt[[i]] = yy[[i]]$firstSplit\n}\n\n\nplyr::ldply(tt)\nlapply(tt,table)\n\ntt.array <- simplify2array(tt)\ntable(tt.array[\"ctree\",,][1,])\n\n\n\nBoston2 <- Boston[1:100,]\n\nret2 <- stable(medv~., Boston,methods=c(\"ctree\",\"ctreePrune\",\"rpart\"),n.rep=5,bump.rep=20,\n              samp.method=\"cv\",tuneLength=2,stablelearner=FALSE,parallel=FALSE)\n\nnn = ret2$where.ctree\nnn\n\nlibrary(ISLR)\ndata(Default)\nDefault=Default[1:300,]\n\nyy = dtree(default ~ ., data=Default,methods=c(\"rpart\"),samp.method=\"boot\",bump.rep=10)\nsummary(yy)\nstr(yy$BestMod)\n\nyy$BestMod$frame$var == \"<leaf>\"\n\nret <- stable(default ~ ., data=Default,methods=c(\"ctree\",\"rpart\",\"evtree\",\"ctreePrune\"),n.rep=40,bump.rep=20,\n              samp.method=\"cv\",tuneLength=2,stablelearner=FALSE,parallel=TRUE)\n\nret\n\nyy = ret$yy\n\n1-length(unique(yy))/n.rep\n\n\n\nconfusionMatrix(Default$default,predict(yy$ctreePrune.out))$overall[\"Accuracy\"]\nlibrary(pROC)\n?auc\nauc(Default$default,predict(yy$ctreePrune.out,type=\"prob\")[,1])\n",
+    "created" : 1490720720264.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3056811823",
+    "id" : "76BD91CB",
+    "lastKnownWriteTime" : 1490805706,
+    "last_content_update" : 1490805706288,
+    "path" : "C:/Users/RJacobucci/Dropbox/dtree_ex.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -235,7 +235,7 @@ dtree = function(formula,
 
   # ----------------------------------------------------
   if(any(methods == "ctreePrune")){
-    if(verbose==TRUE) cat("Currently running ctreePrune")
+    if(verbose==TRUE) cat("Currently running ctreePrune\n")
    # formula2 <- terms(formula,data=data.train)
     #print(formula2)
    # print(formula)

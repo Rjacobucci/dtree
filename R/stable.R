@@ -78,7 +78,7 @@ stable = function(formula,
       out <- out[lapply(out,is.null)==FALSE]
       out2 <- out2[lapply(out2,is.null)==FALSE]
       firSplit <- firSplit[lapply(firSplit,is.null)==FALSE]
-      ret <- array(NA, dim=c(n.rep,length(methods),ncol(out2[[1]])))
+      ret <- array(NA, dim=c(n.rep,length(methods),7))
 
       for(j in 1:length(out)){
         ret[j,,] <- out2[[j]]

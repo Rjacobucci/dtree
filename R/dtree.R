@@ -98,7 +98,6 @@ dtree = function(formula,
 
   class.response <- class(data.train[,response])
 
-
   if(class.response == "numeric" | class.response == "integer"){
     return.matrix <- matrix(NA,length(methods),7)
     rownames(return.matrix) <- methods

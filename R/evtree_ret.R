@@ -30,16 +30,28 @@ if(class.response == "numeric" | class.response == "integer"){
   ctrl <- trainControl(method=samp.method,classProbs=TRUE,summaryFunction = fiveStats,repeats=repeats)
 }
 
-train.out <- train(formula,data.train,method="evtree",tuneLength=tuneLength,
-                   trControl=ctrl,metric=Metric)
+train.out <- try(train(formula,data.train,method="evtree",tuneLength=tuneLength,
+                   trControl=ctrl,metric=Metric,na.action=na.pass))
+
+if(inherits(train.out, "try-error")){
+  return.matrix[1,] <- c(0,0,0,NA,NA,NA,NA)
+  return.splits <- as.data.frame(matrix(NA,1,2))
+  colnames(return.splits) <- c("var","val")
+  return.splits[1,1] <- "no split"
+  return.splits[1,2] <- 0
+  return.splits[1,1] <- as.character(return.splits[1,1])
+  return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
+  evtree.ret <- NA
+  train.out <- NA
+
+}else{
+
+
 evtree.out <- train.out$finalModel
 
 #if(inherits(train.out, "try-error")){
 #  return.matrix <- NA
 #}else{
-
-
-
 
 
 
@@ -140,12 +152,13 @@ if(class.response == "numeric" | class.response == "integer"){
   }
 }
 
-#}
+}
 ret$return.splits <- return.splits
 ret$firstSplit <- return.splits[1,]
 ret$vec <- return.matrix
 ret$evtree.ret <- evtree.ret
 ret$evtree.train <- train.out
 return(ret)
+
 
 }

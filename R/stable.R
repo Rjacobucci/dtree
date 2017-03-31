@@ -111,7 +111,7 @@ stable = function(formula,
       stopCluster(cl)
       out <- out[lapply(out,is.null)==FALSE]
       out2 <- list()
-      ret <- array(NA, dim=c(n.rep,length(methods),7))
+      ret <- array(NA, dim=c(length(out),length(methods),7))
       firSplit <- list()
       for(i in 1:length(out)){
         out2[[i]] <- out[[i]]$return.matrix

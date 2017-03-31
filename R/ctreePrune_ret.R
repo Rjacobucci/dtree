@@ -44,7 +44,6 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
   breaks <- rep(NA,len)
   for(i in 1:len){
-
     if(is.null(ret.obj[[i]]$split$breaks)==FALSE){
       breaks[i] <- ret.obj[[i]]$split$breaks
     }else{
@@ -54,8 +53,7 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
 
   return.splits <- list()
-
-  if(return.matrix[1,"nsplits"] == 0){
+  if(return.matrix[1,"nsplits"] == 0 | any(is.na(breaks))){
     return.splits <- as.data.frame(matrix(NA,1,2))
     colnames(return.splits) <- c("var","val")
     return.splits[1,1] <- "no split"
@@ -68,8 +66,8 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
     breaks2 <- breaks[complete.cases(breaks)]
     vars2 <- vars[complete.cases(vars)]
-
     return.splits <- data.frame(cbind(preds[vars2],breaks2))
+
     colnames(return.splits) <- c("var","val")
     return.splits[,2] <- as.numeric(as.character(return.splits[,2]))
 
@@ -102,7 +100,9 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
     if(class.response == "numeric" | class.response == "integer"){
       met1[i] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
-      met2[i] <- (cor(test[,response],predict(tt$tree,test)))**2
+      pp = predict(tt$tree,test)
+       if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
+      met2[i] <- (cor(test[,response],pp))**2
     }else{
       if(all(duplicated(test[,response])[-1L])){
         met1[i] <- NA

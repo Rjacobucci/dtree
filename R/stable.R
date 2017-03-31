@@ -85,7 +85,7 @@ stable = function(formula,
       }
     }else{
       data.rep <- list()
-      for(i in 1:length(out)){
+      for(i in 1:n.rep){
         set.seed(i)
         ids <- sample(nrow(data),nrow(data),replace=TRUE)
         data.rep[[i]] <- data[ids,]

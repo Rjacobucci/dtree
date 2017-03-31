@@ -23,7 +23,9 @@ CtreePathFunc <- function (ct, data) {
     for(i in 1:length(Path)){
       if(i == length(Path)) {
         n <- nodes(ct, Node)[[1]]
-      } else {n <- nodes(ct, Path[i + 1])[[1]]}
+      } else {n <- nodes(ct, Path[i + 1])[[1]]
+      #print(all(data[which(as.logical(n$weights)), as.character(unlist(nodes(ct,Path[i])[[1]][[5]])[length(unlist(nodes(ct,Path[i])[[1]][[5]]))])] <= as.numeric(unlist(nodes(ct,Path[i])[[1]][[5]])[3])))
+      }
 
       if(all(data[which(as.logical(n$weights)), as.character(unlist(nodes(ct,Path[i])[[1]][[5]])[length(unlist(nodes(ct,Path[i])[[1]][[5]]))])] <= as.numeric(unlist(nodes(ct,Path[i])[[1]][[5]])[3]))){
         SB <- "<="

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: dtree\nType: Package\nTitle: Decision Trees\nVersion: 0.1.8\nAuthor: Ross Jacobucci\nMaintainer: Ross Jacobucci <rcjacobuc@gmail.com>\nDescription: Combines various decision tree algorithms, plus both\n             linear regression and ensemble methods into one package.\n             Allows for the use of both continuous and categorical outcomes.\n             An optional feature is to quantify the (in)stability to the\n             decision tree methods, indicating when results can be trusted\n             and when ensemble methods may be preferential.\nLicense: GPL (>= 2)\nLazyData: TRUE\nRoxygenNote: 6.0.1\nDepends: rpart,\n         party,\n         evtree,\n         partykit,\n         caret\nSuggests: randomForest,\n          tree,\n          MASS,\n          ISLR,\n          matrixStats,\n          plyr,\n          rpart.utils,\n          stringr,\n          pROC\n",
+    "created" : 1490977508799.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1297972465",
+    "id" : "CA1AFD09",
+    "lastKnownWriteTime" : 1490977512,
+    "last_content_update" : 1490977512939,
+    "path" : "~/GitHub/dtree/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}

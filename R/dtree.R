@@ -19,7 +19,7 @@
 #' @param weights Optional weights for each case.
 #' @param verbose Whether to print what method on
 #'
-#' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases
+#' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases na.pass
 #' @importFrom party nodes where
 #' @import rpart evtree caret partykit
 #' @export

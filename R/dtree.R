@@ -19,7 +19,7 @@
 #' @param weights Optional weights for each case.
 #' @param verbose Whether to print what method on
 #'
-#' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases na.pass
+#' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases na.pass median rnorm
 #' @importFrom party nodes where
 #' @import rpart evtree caret partykit
 #' @export
@@ -183,7 +183,6 @@ dtree = function(formula,
     ret4 <- evtree_ret(formula, data.train,data.test,samp.method,tuneLength=tune.evtree,subset, class.response,response,Metric)
     return.matrix["evtree",] <- ret4$vec
     ret$evtree.out <- ret4$evtree.ret
-    ret$evtree.train <- ret4$evtree.train
     ret$evtree.splits <- ret4$return.splits
     firstSplit["evtree",] <- as.matrix(ret4$firstSplit)
   }

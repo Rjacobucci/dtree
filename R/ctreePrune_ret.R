@@ -44,8 +44,11 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
   breaks <- rep(NA,len)
   for(i in 1:len){
+
     if(is.null(ret.obj[[i]]$split$breaks)==FALSE){
       breaks[i] <- ret.obj[[i]]$split$breaks
+    }else if(is.null(ret.obj[[i]]$split$index)==FALSE){
+      breaks[i] <- median(ret.obj[[i]]$split$index)
     }else{
       breaks[i] <- NA
     }
@@ -53,7 +56,7 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
 
   return.splits <- list()
-  if(return.matrix[1,"nsplits"] == 0 | any(is.na(breaks))){
+  if(return.matrix[1,"nsplits"] == 0 ){
     return.splits <- as.data.frame(matrix(NA,1,2))
     colnames(return.splits) <- c("var","val")
     return.splits[1,1] <- "no split"

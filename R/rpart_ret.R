@@ -112,7 +112,7 @@ if(return.matrix[1,2] > 0){
   rtree2[,1] <- as.character(rtree2[,1])
   rtree2[,2] <- round(as.numeric(as.character(rtree2[,2])),3)
 }else{
-  rtree2 <- NA
+  rtree2 <- c("no split",0)
 }
 
 ret$firstSplit <- rtree2

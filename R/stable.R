@@ -176,9 +176,11 @@ stable = function(formula,
     }
 
     tt.array <- simplify2array(firSplit)
+    #print(tt.array[methods,,])
     firstSplit <- list()
     for(i in 1:length(methods)){
-     firstSplit[[methods[i]]] <-  table(tt.array[methods[i],,][1,])
+    # firstSplit[[methods[i]]] <-  table(matrix(tt.array[methods[i],,],length(methods),2)[1,])
+      firstSplit[[methods[i]]] <-  table(tt.array[methods[i],,][1,])
     }
 
 
@@ -255,7 +257,6 @@ stable = function(formula,
       var.count <- matrix(NA,length(out),length(preds))
       colnames(var.count) <- preds
       where.ctreePrune <- list()
-
       for(i in 1:length(out)){
         hh <- out[[i]]$ctreePrune.splits
         hh[,2] <- round(hh[,2],roundVal)
@@ -288,6 +289,7 @@ stable = function(formula,
       where.bump <- list()
 
       for(i in 1:length(out)){
+
         hh <- out[[i]]$bump.splits
         hh[,2] <- round(hh[,2],roundVal)
         tab <- table(hh[,1])

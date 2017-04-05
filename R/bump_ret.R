@@ -125,7 +125,14 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
     rtree2[,2] <- round(as.numeric(as.character(rtree2[,2])),3)
     ret$return.splits <- return.splits[[loc]]
   }else{
-    rtree2 <- NA
+    rtree2 <- c("no split",0)
+
+    return.splits <- as.data.frame(matrix(NA,1,2))
+    colnames(return.splits) <- c("var","val")
+    return.splits[1,1] <- "no split"
+    return.splits[1,2] <- 0
+    return.splits[1,1] <- as.character(return.splits[1,1])
+    return.splits[1,2] <- as.numeric(as.character(return.splits[1,2]))
     ret$return.splits <- return.splits
   }
 

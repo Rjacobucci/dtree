@@ -83,10 +83,9 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
     ind <- as.numeric(row.names(train.out$bestTune))
     if(class.response == "numeric" | class.response == "integer"){
       #which(train.out$results[,"cp"] == train.out$bestTune)
-
-      return.matrix[1,"rmse.samp"] <- sqrt(mean((data.train[,response] - predict(bump.out,data.train))^2))
+      return.matrix[1,"rmse.samp"] <- sqrt(mean((data.train[,response] - predict(train.out,data.train))^2))
       #return.matrix[1,"misfit.train"] <- mean((data.train[,response] - predict(bump.out))^2)/nrow(data.train)
-      pp = predict(bump.out,data.train)
+      pp = predict(train.out,data.train)
       if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
       return.matrix[1,"rsq.samp"] <- (cor(data.train[,response],pp))**2
 
@@ -99,8 +98,8 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
         return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(bump.out,data.test)))**2
       }
     }else{
-      return.matrix[1,"auc.samp"] <- pROC::auc(data.train[,response],predict(bump.out,test,type="prob")[,1])
-      return.matrix[1,"accuracy.samp"] <- caret::confusionMatrix(data.train[,response],predict(bump.out,data.train))$overall["Accuracy"]
+      return.matrix[1,"auc.samp"] <- pROC::auc(data.train[,response],predict(train.out,data.train,type="prob")[,1])
+      return.matrix[1,"accuracy.samp"] <- caret::confusionMatrix(data.train[,response],predict(train.out,data.train))$overall["Accuracy"]
 
       if(subset==FALSE){
         return.matrix[1,"auc.test"] <- NA

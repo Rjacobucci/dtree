@@ -98,6 +98,7 @@ dtree = function(formula,
 
   class.response <- class(data.train[,response])
 
+
   if(class.response == "numeric" | class.response == "integer"){
     return.matrix <- matrix(NA,length(methods),7)
     rownames(return.matrix) <- methods
@@ -105,12 +106,23 @@ dtree = function(formula,
                                  "rsq.samp","rmse.test","rsq.test")
     Metric="RMSE"
   }else{
-    return.matrix <- matrix(NA,length(methods),7)
-    rownames(return.matrix) <- methods
-    colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
-                                 "accuracy.samp","auc.test","accuracy.test")
 
-    Metric="ROC"
+    if(length(levels(class.response))==2){
+      return.matrix <- matrix(NA,length(methods),7)
+      rownames(return.matrix) <- methods
+      colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
+                                   "accuracy.samp","auc.test","accuracy.test")
+
+      Metric="ROC"
+    }else{
+      return.matrix <- matrix(NA,length(methods),7)
+      rownames(return.matrix) <- methods
+      colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
+                                   "accuracy.samp","auc.test","accuracy.test")
+
+      Metric="Accuracy"
+    }
+
 
   }
 

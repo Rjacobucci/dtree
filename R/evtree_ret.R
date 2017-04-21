@@ -121,7 +121,10 @@ met2 <- rep(NA,20)
     if(all(duplicated(data.train[,response])[-1L])){
       met1 <- NA
     }else{
-      met1 <- pROC::auc(data.train[,response],predict(evtree.out,type="prob")[,1])
+      if(length(levels(class.response)) == 2){
+        met1 <- pROC::auc(data.train[,response],predict(evtree.out,type="prob")[,1])
+      }
+
     }
     met2 <- caret::confusionMatrix(data.train[,response],predict(evtree.out))$overall["Accuracy"]
   }
@@ -148,13 +151,17 @@ if(class.response == "numeric" | class.response == "integer"){
     return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(evtree,data.test)))**2
   }
 }else{
+  if(length(levels(class.response)) == 2){
   return.matrix[1,"auc.samp"] <- met1#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
   return.matrix[1,"accuracy.samp"] <- met2#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
 
-  if(subset==FALSE){
-    # return.matrix[1,"auc.test"] <- NA
+    if(subset==FALSE){
+     # return.matrix[1,"auc.test"] <- NA
+    }else{
+      #  return.matrix[1,"auc.test"] <- NA
+    }
   }else{
-    #  return.matrix[1,"auc.test"] <- NA
+    return.matrix[1,"accuracy.samp"] <- met2
   }
 }
 

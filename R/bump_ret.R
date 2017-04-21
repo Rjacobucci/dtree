@@ -1,6 +1,10 @@
 
 bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,class.response, response,Metric,bump.rep){
 
+
+
+
+
   ret <- list()
   return.splits <- list()
 
@@ -14,22 +18,28 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
     return.matrix <- matrix(NA,1,7)
     colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
                                  "accuracy.samp","auc.test","accuracy.test")
+    if(length(levels(class.response))==2){
 
-    fiveStats <- function(...) c(twoClassSummary(...),
-                                 + defaultSummary(...))
-    ## Everything but the area under the ROC curve:
-    fourStats <- function (data, lev = levels(data$obs), model = NULL)
-    {
+      fiveStats <- function(...) c(twoClassSummary(...),
+                                   + defaultSummary(...))
+      ## Everything but the area under the ROC curve:
+      fourStats <- function (data, lev = levels(data$obs), model = NULL)
+      {
 
-      accKapp<-postResample(data[,"pred"],data[,"obs"])
-      out<-c(accKapp,
-             sensitivity(data[, "pred"], data[, "obs"], lev[1]),
-             specificity(data[, "pred"], data[, "obs"], lev[2]))
-      names(out)[3:4]<-c("Sens","Spec")
-      out
+        accKapp<-postResample(data[,"pred"],data[,"obs"])
+        out<-c(accKapp,
+               sensitivity(data[, "pred"], data[, "obs"], lev[1]),
+               specificity(data[, "pred"], data[, "obs"], lev[2]))
+        names(out)[3:4]<-c("Sens","Spec")
+        out
+      }
+      repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
+      ctrl <- trainControl(method=samp.method,classProbs=TRUE,summaryFunction = fiveStats,repeats=repeats)
+    }else{
+      stop("bumping not current working with multinomial outcome")
+      repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
+      ctrl <- trainControl(method=samp.method,classProbs=TRUE,repeats=repeats)
     }
-    repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
-    ctrl <- trainControl(method=samp.method,classProbs=TRUE,summaryFunction = fiveStats,repeats=repeats)
   }
 
   #bump.out <- bump(formula,data.train)
@@ -98,13 +108,17 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
         return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(bump.out,data.test)))**2
       }
     }else{
+      if(length(levels(class.response)) == 2){
       return.matrix[1,"auc.samp"] <- pROC::auc(data.train[,response],predict(train.out,data.train,type="prob")[,1])
       return.matrix[1,"accuracy.samp"] <- caret::confusionMatrix(data.train[,response],predict(train.out,data.train))$overall["Accuracy"]
 
-      if(subset==FALSE){
-        return.matrix[1,"auc.test"] <- NA
+       if(subset==FALSE){
+          return.matrix[1,"auc.test"] <- NA
+        }else{
+          return.matrix[1,"auc.test"] <- NA
+       }
       }else{
-        return.matrix[1,"auc.test"] <- NA
+        return.matrix[1,"accuracy.samp"] <- caret::confusionMatrix(data.train[,response],predict(train.out,data.train))$overall["Accuracy"]
       }
     }
     bump.matrix[i,] <- return.matrix
@@ -117,6 +131,8 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
   }else{
     loc <-which(max(bump.matrix[,4]) == bump.matrix[,4])[1]
   }
+
+
 
   if(bump.matrix[loc,2] > 0){
     rtree = rpart.utils::rpart.subrules.table(bump.list[[loc]])[1,2:5]

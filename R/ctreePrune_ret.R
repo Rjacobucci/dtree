@@ -110,7 +110,10 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
       if(all(duplicated(test[,response])[-1L])){
         met1[i] <- NA
       }else{
-        met1[i] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
+        if(length(levels(class.response)) == 2){
+          met1[i] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
+        }
+
       }
       met2[i] <- caret::confusionMatrix(test[,response],predict(tt$tree,test))$overall["Accuracy"]
       }
@@ -137,14 +140,19 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
       return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(ctreePrune.out,data.test)))**2
     }
   }else{
-    return.matrix[1,"auc.samp"] <- mean(met1,na.rm=TRUE)#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
-    return.matrix[1,"accuracy.samp"] <- mean(met2)#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
+    if(length(levels(class.response)) == 2){
+      return.matrix[1,"auc.samp"] <- mean(met1,na.rm=TRUE)#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
+      return.matrix[1,"accuracy.samp"] <- mean(met2)#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
 
-    if(subset==FALSE){
-     # return.matrix[1,"auc.test"] <- NA
+      if(subset==FALSE){
+        # return.matrix[1,"auc.test"] <- NA
+      }else{
+        #  return.matrix[1,"auc.test"] <- NA
+      }
     }else{
-    #  return.matrix[1,"auc.test"] <- NA
+      return.matrix[1,"accuracy.samp"] <- mean(met2)
     }
+
   }
 
 

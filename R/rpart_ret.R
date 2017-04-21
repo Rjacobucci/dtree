@@ -13,6 +13,7 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix <- matrix(NA,1,7)
   colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
                                "accuracy.samp","auc.test","accuracy.test")
+  if(length(levels(class.response))==2){
 
   fiveStats <- function(...) c(twoClassSummary(...),
                                + defaultSummary(...))
@@ -29,6 +30,10 @@ if(class.response == "numeric" | class.response == "integer"){
   }
   repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
   ctrl <- trainControl(method=samp.method,classProbs=TRUE,summaryFunction = fiveStats,repeats=repeats)
+  }else{
+    repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
+    ctrl <- trainControl(method=samp.method,classProbs=TRUE,repeats=repeats)
+  }
 }
 
 #rpart.out <- rpart(formula,data.train)
@@ -95,14 +100,21 @@ if(class.response == "numeric" | class.response == "integer"){
         return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(rpart.out,data.test)))**2
       }
 }else{
-  return.matrix[1,"auc.samp"] <- train.out$results[ind,"ROC"]
-  return.matrix[1,"accuracy.samp"] <- train.out$results[ind,"Accuracy"]
 
-  if(subset==FALSE){
-    return.matrix[1,"auc.test"] <- NA
+  if(length(levels(class.response)) == 2){
+    return.matrix[1,"auc.samp"] <- train.out$results[ind,"ROC"]
+    return.matrix[1,"accuracy.samp"] <- train.out$results[ind,"Accuracy"]
+
+    if(subset==FALSE){
+      return.matrix[1,"auc.test"] <- NA
+    }else{
+      return.matrix[1,"auc.test"] <- NA
+    }
   }else{
-    return.matrix[1,"auc.test"] <- NA
+    return.matrix[1,"accuracy.samp"] <- train.out$results[ind,"Accuracy"]
   }
+
+
 }
 
 if(return.matrix[1,2] > 0){

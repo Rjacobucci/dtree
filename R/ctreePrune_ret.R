@@ -1,5 +1,5 @@
 
-ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,response){
+ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,response,tune.ctreePrune){
 
 
   ret <- list()
@@ -15,9 +15,51 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
   }
 
+  if(tune.ctreePrune > 3){
+    stop("can't use more than 3 values for ctreePrune")
+  }
 
+  possible.tune <- c(.05,.01,.001)
+  tune <- possible.tune[1:tune.ctreePrune]
 
-  out <- ctreePrune(formula=formula, data=data.train)
+  out.list <- list()
+
+  for(j in 1:tune.ctreePrune){
+
+    met1 <- rep(NA,20)
+    met2 <- rep(NA,20)
+    for(i in 1:20){
+      set.seed(i)
+
+      ids1 <- sample(nrow(data.train),nrow(data.train),replace=TRUE)
+
+      train <- data.train[ids1,]
+      test <- data.train[-ids1,]
+
+      tt <- ctreePrune(formula=formula, data=train,qstar=tune[j])
+
+      if(class.response == "numeric" | class.response == "integer"){
+        met1[i] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
+        pp = predict(tt$tree,test)
+        if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
+        met2[i] <- (cor(test[,response],pp))**2
+      }else{
+        if(all(duplicated(test[,response])[-1L])){
+          met1[i] <- NA
+        }else{
+          if(length(levels(class.response)) == 2){
+            met1[i] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
+          }
+
+        }
+        met2[i] <- caret::confusionMatrix(test[,response],predict(tt$tree,test))$overall["Accuracy"]
+      }
+
+    }
+    print(met1);print(met2)
+
+  }
+
   ctreePrune.out <- ctreePrune.ret <- out$tree
 
   #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
@@ -88,37 +130,6 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
   return.matrix[1,"nvar"] <- vars3
 
   return.matrix[1,"nodes"] <- length(unique(fitted(ctreePrune.out)[,1]))
-
-  met1 <- rep(NA,20)
-  met2 <- rep(NA,20)
-  for(i in 1:20){
-    set.seed(i)
-
-    ids1 <- sample(nrow(data.train),nrow(data.train),replace=TRUE)
-
-    train <- data.train[ids1,]
-    test <- data.train[-ids1,]
-
-    tt <- ctreePrune(formula=formula, data=train)
-
-    if(class.response == "numeric" | class.response == "integer"){
-      met1[i] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
-      pp = predict(tt$tree,test)
-       if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
-      met2[i] <- (cor(test[,response],pp))**2
-    }else{
-      if(all(duplicated(test[,response])[-1L])){
-        met1[i] <- NA
-      }else{
-        if(length(levels(class.response)) == 2){
-          met1[i] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
-        }
-
-      }
-      met2[i] <- caret::confusionMatrix(test[,response],predict(tt$tree,test))$overall["Accuracy"]
-      }
-
-  }
 
 
 

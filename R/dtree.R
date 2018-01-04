@@ -65,6 +65,9 @@ dtree = function(formula,
     if(any(methods=="ctree")){
       tune.ctree <- tuneLength[methods=="ctree"]
     }
+    if(any(methods=="ctreePrune")){
+      tune.ctreePrune <- tuneLength[methods=="ctreePrune"]
+    }
     if(any(methods=="evtree")){
       tune.evtree <- tuneLength[methods=="evtree"]
     }
@@ -251,7 +254,7 @@ dtree = function(formula,
    # print(formula)
     #print(formula2)
     #ret77 <- do.call(partykit::ctree,list(formula=medv~., data=Boston))
-    ret7 <- ctreePrune_ret(formula,data.train,data.test,class.response,subset,response)
+    ret7 <- ctreePrune_ret(formula,data.train,data.test,class.response,subset,response,tune.ctreePrune)
     return.matrix["ctreePrune",] <- ret7$vec
     ret$ctreePrune.out <- ret7$ctreePrune.ret
     ret$ctreePrune.splits <- ret7$return.splits

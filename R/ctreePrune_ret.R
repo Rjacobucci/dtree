@@ -1,5 +1,5 @@
 
-ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,response,tune.ctreePrune){
+ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,response,tune.ctreePrune,Metric){
 
 
   ret <- list()
@@ -24,10 +24,12 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
 
   out.list <- list()
 
+  met1 <- matrix(NA,20,tune.ctreePrune)
+  met2 <- matrix(NA,20,tune.ctreePrune)
+
   for(j in 1:tune.ctreePrune){
 
-    met1 <- rep(NA,20)
-    met2 <- rep(NA,20)
+
     for(i in 1:20){
       set.seed(i)
 
@@ -39,27 +41,41 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
       tt <- ctreePrune(formula=formula, data=train,qstar=tune[j])
 
       if(class.response == "numeric" | class.response == "integer"){
-        met1[i] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
+        met1[i,j] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
         pp = predict(tt$tree,test)
         if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
-        met2[i] <- (cor(test[,response],pp))**2
+        met2[i,j] <- (cor(test[,response],pp))**2
       }else{
         if(all(duplicated(test[,response])[-1L])){
-          met1[i] <- NA
+          met1[i,j] <- NA
         }else{
           if(length(levels(class.response)) == 2){
-            met1[i] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
+            met1[i,j] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
           }
 
         }
-        met2[i] <- caret::confusionMatrix(test[,response],predict(tt$tree,test))$overall["Accuracy"]
+        met2[i,j] <- caret::confusionMatrix(test[,response],predict(tt$tree,test))$overall["Accuracy"]
       }
 
     }
-    print(met1);print(met2)
 
   }
 
+
+    if(Metric=="RMSE" ){
+      loc = which(colMeans(met1) == min(colMeans(met1)))
+      best.tune <- tune[loc]
+    }else if(Metric=="ROC"){
+      loc = which(colMeans(met1) == max(colMeans(met1)))
+      best.tune <- tune[loc]
+    }else if(Metric=="Accuracy"){
+      loc = which(colMeans(met2) == max(colMeans(met2)))
+      best.tune <- tune[loc]
+    }
+
+
+
+  out <- ctreePrune(formula=formula, data=train,qstar=best.tune)
   ctreePrune.out <- ctreePrune.ret <- out$tree
 
   #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]
@@ -139,8 +155,8 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
     #which(train.out$results[,"cp"] == train.out$bestTune)
 
     #return.matrix[1,"rmse.samp"] <- train.out$results[ind,"RMSE"]
-    return.matrix[1,"rmse.samp"] <- mean(met1) #sqrt(mean((data.train[,response] - predict(ctreePrune.out))^2))
-    return.matrix[1,"rsq.samp"] <- mean(met2) #(cor(data.train[,response],predict(ctreePrune.out)))**2
+    return.matrix[1,"rmse.samp"] <- mean(met1[,loc])
+    return.matrix[1,"rsq.samp"] <- mean(met2[,loc])
    #return.matrix[1,"rsq.samp"] <- train.out$results[ind,"Rsquared"]
 
     if(subset==FALSE){
@@ -152,8 +168,8 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
     }
   }else{
     if(length(levels(class.response)) == 2){
-      return.matrix[1,"auc.samp"] <- mean(met1,na.rm=TRUE)#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
-      return.matrix[1,"accuracy.samp"] <- mean(met2)#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
+      return.matrix[1,"auc.samp"] <- mean(met1[,loc],na.rm=TRUE)#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
+      return.matrix[1,"accuracy.samp"] <- mean(met2[,loc])#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
 
       if(subset==FALSE){
         # return.matrix[1,"auc.test"] <- NA
@@ -161,7 +177,7 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
         #  return.matrix[1,"auc.test"] <- NA
       }
     }else{
-      return.matrix[1,"accuracy.samp"] <- mean(met2)
+      return.matrix[1,"accuracy.samp"] <- mean(met2[,loc])
     }
 
   }

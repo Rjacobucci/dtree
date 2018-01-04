@@ -55,9 +55,11 @@ dtree = function(formula,
     stop("weights are currently not implemented")
   }
 
+
+
   ret <- list()
   if(length(tuneLength)==1){
-    tune.rpart <- tune.ctree <- tune.evtree <- tune.rf <- tuneLength
+    tune.rpart <- tune.ctree <- tune.evtree <- tune.rf <- tune.ctreePrune <- tuneLength
   }else{
     if(any(methods=="rpart")){
       tune.rpart <- tuneLength[methods=="rpart"]
@@ -254,7 +256,7 @@ dtree = function(formula,
    # print(formula)
     #print(formula2)
     #ret77 <- do.call(partykit::ctree,list(formula=medv~., data=Boston))
-    ret7 <- ctreePrune_ret(formula,data.train,data.test,class.response,subset,response,tune.ctreePrune)
+    ret7 <- ctreePrune_ret(formula,data.train,data.test,class.response,subset,response,tune.ctreePrune,Metric)
     return.matrix["ctreePrune",] <- ret7$vec
     ret$ctreePrune.out <- ret7$ctreePrune.ret
     ret$ctreePrune.splits <- ret7$return.splits

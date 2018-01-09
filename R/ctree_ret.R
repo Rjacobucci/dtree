@@ -36,7 +36,17 @@ if(class.response == "numeric" | class.response == "integer"){
   }
 }
 
-train.out <- train(formula,data.train,method="ctree",tuneLength=tuneLength,
+if(tuneLength > 3){
+  stop("can't use more than 3 tuning values for ctree")
+}
+
+possible.tune <- c(.95,.99,.999)
+tune <- possible.tune[1:tuneLength]
+grid = expand.grid(tune)
+
+names(grid) <- "mincriterion"
+
+train.out <- train(formula,data.train,method="ctree",tuneGrid=grid,
                    trControl=ctrl,metric=Metric,na.action=na.pass)
 ctree.out <- train.out$finalModel
 

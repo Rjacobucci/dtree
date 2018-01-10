@@ -112,7 +112,7 @@ dtree = function(formula,
     Metric="RMSE"
   }else{
 
-    if(length(levels(class.response))==2){
+    if(length(unique(data.train[,response]))==2){
       return.matrix <- matrix(NA,length(methods),7)
       rownames(return.matrix) <- methods
       colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",

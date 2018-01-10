@@ -15,7 +15,71 @@ if(class.response == "numeric" | class.response == "integer"){
 
 }
 
-evtree.out <- evtree(formula,data.train)
+
+
+if(tuneLength > 3){
+  stop("can't use more than 3 values for evtree")
+}
+
+possible.tune <- c(1,2,3)
+tune <- possible.tune[1:tuneLength]
+
+out.list <- list()
+
+met1 <- matrix(NA,20,tuneLength)
+met2 <- matrix(NA,20,tuneLength)
+
+for(j in 1:tuneLength){
+
+
+  for(i in 1:20){
+    set.seed(i)
+
+    ids1 <- sample(nrow(data.train),nrow(data.train),replace=TRUE)
+
+    train <- data.train[ids1,]
+    test <- data.train[-ids1,]
+
+    tt <- evtree(formula=formula, data=train,control=evtree.control(alpha=tune[j]))
+
+    if(class.response == "numeric" | class.response == "integer"){
+      met1[i,j] <- sqrt(mean((test[,response] - predict(tt,test))^2))
+      pp = predict(tt$tree,test)
+      if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
+      met2[i,j] <- (cor(test[,response],pp))**2
+    }else{
+      if(all(duplicated(test[,response])[-1L])){
+        met1[i,j] <- NA
+      }else{
+        if(length(unique(data.train[,response])) == 2){
+          met1[i,j] <- pROC::auc(test[,response],predict(tt,test,type="prob")[,1])
+        }
+
+      }
+      met2[i,j] <- caret::confusionMatrix(test[,response],predict(tt,test))$overall["Accuracy"]
+    }
+
+  }
+
+}
+
+
+
+
+if(Metric=="RMSE" ){
+  loc = which(colMeans(met1,na.rm=T) == min(colMeans(met1,na.rm=T)))
+  best.tune <- tune[loc]
+}else if(Metric=="ROC"){
+  loc = which(colMeans(met1,na.rm=T) == max(colMeans(met1,na.rm=T)))
+  best.tune <- tune[loc]
+}else if(Metric=="Accuracy"){
+  loc = which(colMeans(met2,na.rm=T) == max(colMeans(met2,na.rm=T)))
+  best.tune <- tune[loc]
+}
+
+
+evtree.out <- evtree(formula,data.train,control=evtree.control(alpha=tune[j]))
+
 
 #if(inherits(train.out, "try-error")){
 #  return.matrix[1,] <- c(0,0,0,NA,NA,NA,NA)
@@ -109,38 +173,14 @@ return.matrix[1,"nvar"] <- vars3
 
 return.matrix[1,"nodes"] <- length(unique(fitted(evtree.out)[,1]))
 
-met1 <- rep(NA,20)
-met2 <- rep(NA,20)
-
-  if(class.response == "numeric" | class.response == "integer"){
-    met1 <- sqrt(mean((data.train[,response] - predict(evtree.out))^2))
-    pp = predict(evtree.out)
-    if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
-    met2 <- (cor(data.train[,response],pp))**2
-  }else{
-    if(all(duplicated(data.train[,response])[-1L])){
-      met1 <- NA
-    }else{
-      if(length(levels(class.response)) == 2){
-        met1 <- pROC::auc(data.train[,response],predict(evtree.out,type="prob")[,1])
-      }
-
-    }
-    met2 <- caret::confusionMatrix(data.train[,response],predict(evtree.out))$overall["Accuracy"]
-  }
-
-
-
-
-
 
 
 if(class.response == "numeric" | class.response == "integer"){
   #which(train.out$results[,"cp"] == train.out$bestTune)
 
   #return.matrix[1,"rmse.samp"] <- train.out$results[ind,"RMSE"]
-  return.matrix[1,"rmse.samp"] <- met1 #sqrt(mean((data.train[,response] - predict(ctreePrune.out))^2))
-  return.matrix[1,"rsq.samp"] <- met2 #(cor(data.train[,response],predict(ctreePrune.out)))**2
+  return.matrix[1,"rmse.samp"] <- mean(met1[,loc])
+  return.matrix[1,"rsq.samp"] <- mean(met2[,loc])
   #return.matrix[1,"rsq.samp"] <- train.out$results[ind,"Rsquared"]
 
   if(subset==FALSE){
@@ -148,21 +188,22 @@ if(class.response == "numeric" | class.response == "integer"){
     return.matrix[1,"rsq.test"] <- NA
   }else{
     return.matrix[1,"rmse.test"] <- sqrt(mean((data.test[,response] - predict(evtree.out,data.test))^2))
-    return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(evtree,data.test)))**2
+    return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(evtree.out,data.test)))**2
   }
 }else{
-  if(length(levels(class.response)) == 2){
-  return.matrix[1,"auc.samp"] <- met1#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
-  return.matrix[1,"accuracy.samp"] <- met2#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
+  if(length(unique(data.train[,response])) == 2){
+    return.matrix[1,"auc.samp"] <- mean(met1[,loc],na.rm=TRUE)#pROC::auc(data.train[,response],predict(ctreePrune.out,type="prob")[,1])
+    return.matrix[1,"accuracy.samp"] <- mean(met2[,loc])#caret::confusionMatrix(data.train[,response],predict(ctreePrune.out))$overall["Accuracy"]
 
     if(subset==FALSE){
-     # return.matrix[1,"auc.test"] <- NA
+      # return.matrix[1,"auc.test"] <- NA
     }else{
       #  return.matrix[1,"auc.test"] <- NA
     }
   }else{
-    return.matrix[1,"accuracy.samp"] <- met2
+    return.matrix[1,"accuracy.samp"] <- mean(met2[,loc])
   }
+
 }
 
 #}

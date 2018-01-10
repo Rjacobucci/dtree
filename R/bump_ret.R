@@ -18,7 +18,7 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
     return.matrix <- matrix(NA,1,7)
     colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
                                  "accuracy.samp","auc.test","accuracy.test")
-    if(length(levels(class.response))==2){
+    if(length(unique(data.train[,response]))==2){
 
       fiveStats <- function(...) c(twoClassSummary(...),
                                    + defaultSummary(...))
@@ -108,7 +108,7 @@ bump_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subse
         return.matrix[1,"rsq.test"] <- (cor(data.test[,response],predict(bump.out,data.test)))**2
       }
     }else{
-      if(length(levels(class.response)) == 2){
+      if(length(unique(data.train[,response])) == 2){
       return.matrix[1,"auc.samp"] <- pROC::auc(data.train[,response],predict(train.out,data.train,type="prob")[,1])
       return.matrix[1,"accuracy.samp"] <- caret::confusionMatrix(data.train[,response],predict(train.out,data.train))$overall["Accuracy"]
 

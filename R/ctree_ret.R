@@ -13,7 +13,7 @@ if(class.response == "numeric" | class.response == "integer"){
   return.matrix <- matrix(NA,1,7)
   colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
                                "accuracy.samp","auc.test","accuracy.test")
-  if(length(levels(class.response))==2){
+  if(length(unique(data.train[,response]))==2){
 
     fiveStats <- function(...) c(twoClassSummary(...),
                                  + defaultSummary(...))
@@ -143,7 +143,7 @@ if(class.response == "numeric" | class.response == "integer"){
   }
 }else{
 
-  if(length(levels(class.response)) == 2){
+  if(length(unique(data.train[,response])) == 2){
     return.matrix[1,"auc.samp"] <- train.out$results[ind,"ROC"]
     return.matrix[1,"accuracy.samp"] <- train.out$results[ind,"Accuracy"]
 

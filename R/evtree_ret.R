@@ -44,7 +44,7 @@ for(j in 1:tuneLength){
 
     if(class.response == "numeric" | class.response == "integer"){
       met1[i,j] <- sqrt(mean((test[,response] - predict(tt,test))^2))
-      pp = predict(tt$tree,test)
+      pp = predict(tt,test)
       if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
       met2[i,j] <- (cor(test[,response],pp))**2
     }else{

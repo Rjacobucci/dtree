@@ -1,7 +1,7 @@
 Package: dtree
 Type: Package
 Title: Decision Trees
-Version: 0.4.0
+Version: 0.4.1
 Author: Ross Jacobucci
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Combines various decision tree algorithms, plus both

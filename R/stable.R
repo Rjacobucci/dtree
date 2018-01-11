@@ -68,7 +68,9 @@ stable = function(formula,
           out2[[i]] <- NULL
           firSplit[[i]] <- NULL
         }else{
+          print(tt)
           out[[i]] <- tt
+          print(out[[i]]$return.matrix)
           out2[[i]] <- out[[i]]$return.matrix
           firSplit[[i]] <- out[[i]]$firstSplit
         }

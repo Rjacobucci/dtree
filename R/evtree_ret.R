@@ -40,7 +40,7 @@ for(j in 1:tuneLength){
     train <- data.train[ids1,]
     test <- data.train[-ids1,]
 
-    tt <- evtree(formula=formula, data=train,control=evtree.control(alpha=tune[j]))
+    tt <- evtree(formula=formula, data=train,control=evtree.control(alpha=tune[j],ntrees=30L, niterations=1000))
 
     if(class.response == "numeric" | class.response == "integer"){
       met1[i,j] <- sqrt(mean((test[,response] - predict(tt,test))^2))

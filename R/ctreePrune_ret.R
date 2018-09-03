@@ -43,7 +43,7 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
       if(class.response == "numeric" | class.response == "integer"){
         met1[i,j] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
         pp = predict(tt$tree,test)
-        if(sd(pp)==0) pp <- pp+rnorm(length(pp),0,.000001)
+        if(sd(pp,na.rm=T)==0) pp <- pp+rnorm(length(pp),0,.000001)
         met2[i,j] <- (cor(test[,response],pp))**2
       }else{
         if(all(duplicated(test[,response])[-1L])){

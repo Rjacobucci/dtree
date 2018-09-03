@@ -68,9 +68,9 @@ stable = function(formula,
           out2[[i]] <- NULL
           firSplit[[i]] <- NULL
         }else{
-          print(tt)
+         # print(tt)
           out[[i]] <- tt
-          print(out[[i]]$return.matrix)
+         # print(out[[i]]$return.matrix)
           out2[[i]] <- out[[i]]$return.matrix
           firSplit[[i]] <- out[[i]]$firstSplit
         }
@@ -132,6 +132,9 @@ stable = function(formula,
     stability <- matrix(NA,1,length(methods))
     colnames(stability) <- methods
 
+    similarity <- matrix(NA,1,length(methods))
+    colnames(similarity) <- methods
+
     row.names(ret.mean) <- methods
     row.names(ret.var) <- methods
 
@@ -166,6 +169,23 @@ stable = function(formula,
         }
       }
 
+      #sim.mat = data.frame()#matrix(NA,n.rep,length(out[[1]]$ctree.out@get_where()))
+    #  for(i in 1:n.rep){
+    #    if(i ==1){
+     #     sim.mat = out[[i]]$ctree.out@get_where()
+    #    }else{
+      ##    sim.mat = data.frame(sim.mat,out[[i]]$ctree.out@get_where())
+      #  }
+        #sim.mat[i,] = out[[i]]$ctree.out@get_where()
+     # }
+
+
+      clus.mat = rep(NA,n.rep-1)
+      for(i in 1:(n.rep-1)){
+        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$ctree.out@get_where(),
+                                                    out[[i+1]]$ctree.out@get_where())
+      }
+
       counts.mean["ctree",] <- colMeans(var.count)
       counts.var["ctree",] <- round(matrixStats::colVars(var.count),2)
       nn <- plyr::ldply(where.ctree)
@@ -175,6 +195,7 @@ stable = function(formula,
         res$where.ctree <- sapply(split(nn, nn$var),table)
       }
       stability[,"ctree"] <- 1-length(unique(where.ctree))/n.rep
+      similarity[,"ctree"] = mean(clus.mat)
     }
 
     tt.array <- simplify2array(firSplit)
@@ -194,6 +215,11 @@ stable = function(formula,
       where.rpart <- list()
 
 
+      clus.mat = rep(NA,n.rep-1)
+      for(i in 1:(n.rep-1)){
+        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$rpart.out$where,
+                                                    out[[i+1]]$rpart.out$where)
+      }
 
 
       for(i in 1:length(out)){
@@ -220,6 +246,7 @@ stable = function(formula,
         res$where.rpart <- sapply(split(nn, nn$var),table)
       }
       stability[,"rpart"] <- 1-length(unique(where.rpart))/length(out)
+      similarity[,"rpart"] <- mean(clus.mat)
     }
 
 
@@ -228,6 +255,13 @@ stable = function(formula,
       var.count <- matrix(NA,length(out),length(preds))
       colnames(var.count) <- preds
       where.evtree <- list()
+
+      clus.mat = rep(NA,n.rep-1)
+      for(i in 1:(n.rep-1)){
+        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$evtree.out$fitted$`(fitted)`,
+                                                    out[[i+1]]$evtree.out$fitted$`(fitted)`)
+      }
+
 
       for(i in 1:length(out)){
         hh <- out[[i]]$evtree.splits
@@ -252,6 +286,7 @@ stable = function(formula,
         res$where.evtree <- sapply(split(nn, nn$var),table)
       }
       stability[,"evtree"] <- 1-length(unique(where.evtree))/length(out)
+      similarity[,"evtree"] <- mean(clus.mat)
     }
 
 
@@ -259,6 +294,13 @@ stable = function(formula,
       var.count <- matrix(NA,length(out),length(preds))
       colnames(var.count) <- preds
       where.ctreePrune <- list()
+
+      clus.mat = rep(NA,n.rep-1)
+      for(i in 1:(n.rep-1)){
+        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$ctreePrune.out$fitted$`(fitted)`,
+                                                    out[[i+1]]$ctreePrune.out$fitted$`(fitted)`)
+      }
+
       for(i in 1:length(out)){
         hh <- out[[i]]$ctreePrune.splits
         hh[,2] <- round(hh[,2],roundVal)
@@ -282,6 +324,7 @@ stable = function(formula,
         res$where.ctreePrune <- sapply(split(nn, nn$var),table)
       }
       stability[,"ctreePrune"] <- 1-length(unique(where.ctreePrune))/length(out)
+      stability[,"ctreePrune"] = mean(clus.mat)
     }
 
 
@@ -317,6 +360,7 @@ stable = function(formula,
     res$n.ret <- length(out)
     res$firstSplit <- firstSplit
     res$stability <- stability
+    res$similarity <- similarity
     res$counts.mean <- counts.mean
     res$counts.var <- counts.var
     res$means <- round(ret.mean,3)

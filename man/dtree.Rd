@@ -4,7 +4,7 @@
 \alias{dtree}
 \title{Main function for creating different types of decision trees}
 \usage{
-dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
+dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree"),
   samp.method = "repeatedcv", tuneLength = 3, bump.rep = 50,
   subset = FALSE, perc.sub = 0.75, weights = NULL, verbose = TRUE)
 }

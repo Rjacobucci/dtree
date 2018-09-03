@@ -42,7 +42,7 @@
 
 dtree = function(formula,
                  data,
-                 methods=c("lm","rpart","tree","ctree","evtree"),
+                 methods=c("lm","rpart","tree","ctree"),
                  samp.method="repeatedcv",
                  tuneLength=3,
                  bump.rep=50,

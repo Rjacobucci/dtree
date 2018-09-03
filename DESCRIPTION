@@ -1,7 +1,7 @@
 Package: dtree
 Type: Package
 Title: Decision Trees
-Version: 0.4.2
+Version: 0.6.0
 Author: Ross Jacobucci
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Combines various decision tree algorithms, plus both
@@ -12,7 +12,7 @@ Description: Combines various decision tree algorithms, plus both
              and when ensemble methods may be preferential.
 License: GPL (>= 2)
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Depends: rpart,
          party,
          evtree,
@@ -21,6 +21,7 @@ Depends: rpart,
 Suggests: randomForest,
           tree,
           MASS,
+          clusteval,
           ISLR,
           matrixStats,
           plyr,

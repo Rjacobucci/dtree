@@ -4,11 +4,11 @@
 \alias{stable}
 \title{Main function to calculate stability coefficients}
 \usage{
-stable(formula, data, methods = c("lm", "rpart", "tree", "ctree", "evtree"),
-  samp.method = "repeatedcv", tuneLength = 3, n.rep = 100,
+stable(formula, data, methods = c("lm", "rpart", "tree", "ctree",
+  "evtree"), samp.method = "repeatedcv", tuneLength = 3, n.rep = 100,
   bump.rep = 50, parallel = FALSE, ncore = detectCores() - 1,
-  roundVal = 1, stablelearner = FALSE, subset = FALSE, perc.sub = 0.75,
-  weights = NULL)
+  roundVal = 1, stablelearner = FALSE, subset = FALSE,
+  perc.sub = 0.75, weights = NULL)
 }
 \arguments{
 \item{formula}{a formula, weight a response to left of ~.}

@@ -53,6 +53,9 @@ stable = function(formula,
   out2 <- list()
   firSplit <- list()
 
+  orig.tree <- try(dtree(formula,data,methods,samp.method,
+                  tuneLength,bump.rep,subset,perc.sub,weights,verbose=FALSE))
+
   if(stablelearner==FALSE){
 
 
@@ -180,10 +183,10 @@ stable = function(formula,
      # }
 
 
-      clus.mat = rep(NA,n.rep-1)
-      for(i in 1:(n.rep-1)){
-        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$ctree.out@get_where(),
-                                                    out[[i+1]]$ctree.out@get_where())
+      clus.mat = rep(NA,n.rep)
+      for(i in 1:(n.rep)){
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where(),
+                                                    out[[i]]$ctree.out@get_where())
       }
 
       counts.mean["ctree",] <- colMeans(var.count)
@@ -215,10 +218,10 @@ stable = function(formula,
       where.rpart <- list()
 
 
-      clus.mat = rep(NA,n.rep-1)
-      for(i in 1:(n.rep-1)){
-        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$rpart.out$where,
-                                                    out[[i+1]]$rpart.out$where)
+      clus.mat = rep(NA,n.rep)
+      for(i in 1:(n.rep)){
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$rpart.out$where,
+                                                    out[[i]]$rpart.out$where)
       }
 
 
@@ -256,10 +259,10 @@ stable = function(formula,
       colnames(var.count) <- preds
       where.evtree <- list()
 
-      clus.mat = rep(NA,n.rep-1)
-      for(i in 1:(n.rep-1)){
-        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$evtree.out$fitted$`(fitted)`,
-                                                    out[[i+1]]$evtree.out$fitted$`(fitted)`)
+      clus.mat = rep(NA,n.rep)
+      for(i in 1:(n.rep)){
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$evtree.out$fitted$`(fitted)`,
+                                                    out[[i]]$evtree.out$fitted$`(fitted)`)
       }
 
 
@@ -295,10 +298,10 @@ stable = function(formula,
       colnames(var.count) <- preds
       where.ctreePrune <- list()
 
-      clus.mat = rep(NA,n.rep-1)
-      for(i in 1:(n.rep-1)){
-        clus.mat[i] = clusteval::cluster_similarity(out[[i]]$ctreePrune.out$fitted$`(fitted)`,
-                                                    out[[i+1]]$ctreePrune.out$fitted$`(fitted)`)
+      clus.mat = rep(NA,n.rep)
+      for(i in 1:(n.rep)){
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`,
+                                                    out[[i]]$ctreePrune.out$fitted$`(fitted)`)
       }
 
       for(i in 1:length(out)){
@@ -324,7 +327,7 @@ stable = function(formula,
         res$where.ctreePrune <- sapply(split(nn, nn$var),table)
       }
       stability[,"ctreePrune"] <- 1-length(unique(where.ctreePrune))/length(out)
-      stability[,"ctreePrune"] = mean(clus.mat)
+      similarity[,"ctreePrune"] = mean(clus.mat)
     }
 
 

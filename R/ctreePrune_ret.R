@@ -51,7 +51,14 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
           met1[i,j] <- NA
         }else{
           if(length(unique(data.train[,response])) == 2){
-            met1[i,j] <- pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1])
+
+          mm  <- try(pROC::auc(test[,response],predict(tt$tree,test,type="prob")[,1]),silent=T)
+          if(inherits(mm, "try-error")){
+            met1[i,j] = NA
+          }else{
+            met1[i,j] = mm
+          }
+
           }
 
         }

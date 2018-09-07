@@ -61,7 +61,7 @@ ctreePrune <- function(formula,data,qstar=0.05,sizeSatu=0.999)  {
 ### fit: object of class party
 ###
 #################################################
-fdrprune <- function(fit,qstar=0.05){
+fdrprune <- function(fit,qstar){
 
   ###################################################
   #####  Collect relevant information about the tree

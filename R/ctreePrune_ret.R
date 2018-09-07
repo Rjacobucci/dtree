@@ -38,14 +38,16 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
       train <- data.train[ids1,]
       test <- data.train[-ids1,]
 
+
       tt <- ctreePrune(formula=formula, data=train,qstar=tune[j])
 
+
       if(class.response == "numeric" | class.response == "integer"){
-        met1[i,j] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2))
+        met1[i,j] <- sqrt(mean((test[,response] - predict(tt$tree,test))^2,na.rm=T))
         pp = predict(tt$tree,test)
 
         if(sd(pp,na.rm=T)==0) pp <- pp+rnorm(length(pp),0,.000001)
-        met2[i,j] <- (cor(test[,response],pp))**2
+        met2[i,j] <- cor(test[,response],pp,use="pairwise.complete.obs")**2
       }else{
         if(all(duplicated(test[,response])[-1L])){
           met1[i,j] <- NA

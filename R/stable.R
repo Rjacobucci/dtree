@@ -185,8 +185,14 @@ stable = function(formula,
 
       clus.mat = rep(NA,n.rep)
       for(i in 1:(n.rep)){
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where(),
-                                                    out[[i]]$ctree.out@get_where())
+        set.seed(i)
+        ids <- sample(nrow(data),nrow(data),replace=TRUE)
+        uni = unique(ids)
+        boot = data[ids,]
+        tt = prodlim::row.match(boot[uni,],data)
+        print(summary(boot[uni,]));print(summary(data[tt,]))
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where()[uni],
+                                                    out[[i]]$ctree.out@get_where()[tt])
       }
 
       counts.mean["ctree",] <- colMeans(var.count)
@@ -220,8 +226,13 @@ stable = function(formula,
 
       clus.mat = rep(NA,n.rep)
       for(i in 1:(n.rep)){
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$rpart.out$where,
-                                                    out[[i]]$rpart.out$where)
+        set.seed(i)
+        ids <- sample(nrow(data),nrow(data),replace=TRUE)
+        uni = unique(ids)
+        boot = data[ids,]
+        tt = prodlim::row.match(boot[uni,],data)
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$rpart.out$where[uni],
+                                                    out[[i]]$rpart.out$where[tt])
       }
 
 
@@ -261,8 +272,13 @@ stable = function(formula,
 
       clus.mat = rep(NA,n.rep)
       for(i in 1:(n.rep)){
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$evtree.out$fitted$`(fitted)`,
-                                                    out[[i]]$evtree.out$fitted$`(fitted)`)
+        set.seed(i)
+        ids <- sample(nrow(data),nrow(data),replace=TRUE)
+        uni = unique(ids)
+        boot = data[ids,]
+        tt = prodlim::row.match(boot[uni,],data)
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$evtree.out$fitted$`(fitted)`[uni],
+                                                    out[[i]]$evtree.out$fitted$`(fitted)`[tt])
       }
 
 
@@ -300,8 +316,13 @@ stable = function(formula,
 
       clus.mat = rep(NA,n.rep)
       for(i in 1:(n.rep)){
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`,
-                                                    out[[i]]$ctreePrune.out$fitted$`(fitted)`)
+        set.seed(i)
+        ids <- sample(nrow(data),nrow(data),replace=TRUE)
+        uni = unique(ids)
+        boot = data[ids,]
+        tt = prodlim::row.match(boot[uni,],data)
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`[uni],
+                                                    out[[i]]$ctreePrune.out$fitted$`(fitted)`[tt])
       }
 
       for(i in 1:length(out)){

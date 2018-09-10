@@ -14,7 +14,7 @@ dtree(formula, data, methods = c("lm", "rpart", "tree", "ctree"),
 \item{data}{Data frame to run models on}
 
 \item{methods}{Which tree methods to use. Defaults:
-lm, rpart, ctree, evtree. Also can use "rf" for random forests.
+lm, rpart, ctree, evtree. Also can use "rf" for random forests (cforest from party).
 Also a FDR pruning method for ctree termed "ctreePrune".
 Finally bumping is implemented as methods="bump".}
 

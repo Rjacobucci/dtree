@@ -3,7 +3,7 @@
 #' @param formula a formula, with a response to left of ~.
 #' @param data Data frame to run models on
 #' @param methods Which tree methods to use. Defaults:
-#'        lm, rpart, ctree, evtree. Also can use "rf" for random forests.
+#'        lm, rpart, ctree, evtree. Also can use "rf" for random forests (cforest from party).
 #'        Also a FDR pruning method for ctree termed "ctreePrune".
 #'        Finally bumping is implemented as methods="bump".
 #' @param samp.method Sampling method. Refer to caret package trainControl()

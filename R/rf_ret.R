@@ -10,13 +10,13 @@ rf_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,
 
     repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
     ctrl <- trainControl(method=samp.method,repeats=repeats)
-    rfMethod="rf"
+    rfMethod="cforest"
   }else{
     return.matrix <- matrix(NA,1,7)
     colnames(return.matrix) <- c("nodes","nvar","nsplits","auc.samp",
                                  "accuracy.samp","auc.test","accuracy.test")
     if(length(unique(data.train[,response]))==2){
-      rfMethod="rf"
+      rfMethod="cforest"
       fiveStats <- function(...) c(twoClassSummary(...),
                                    + defaultSummary(...))
       ## Everything but the area under the ROC curve:
@@ -35,13 +35,13 @@ rf_ret <- function(formula, data.train, data.test,samp.method,tuneLength,subset,
     }else{
       repeats <- ifelse(grepl("repeatedcv", samp.method), 10, 1)
       ctrl <- trainControl(method=samp.method,classProbs=TRUE,repeats=repeats)
-      rfMethod="rf"
+      rfMethod="cforest"
     }
   }
 
 
 
-  train.out <- train(formula,data.train,method=rfMethod,tuneLength=tuneLength,
+  train.out <- train(formula,data.train,method="cforest",tuneLength=tuneLength,
                      trControl=ctrl,metric=Metric,na.action=na.pass)
   rf.out <- train.out$finalModel
 

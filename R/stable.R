@@ -190,7 +190,6 @@ stable = function(formula,
         uni = unique(ids)
         boot = data[ids,]
         tt = prodlim::row.match(boot[uni,],data)
-        print(summary(boot[uni,]));print(summary(data[tt,]))
         clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where()[uni],
                                                     out[[i]]$ctree.out@get_where()[tt])
       }

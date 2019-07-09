@@ -190,8 +190,8 @@ stable = function(formula,
         uni = unique(ids)
         boot = data[ids,]
         tt = prodlim::row.match(boot[uni,],data)
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where()[uni],
-                                                    out[[i]]$ctree.out@get_where()[tt])
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where()[tt],
+                                                    out[[i]]$ctree.out@get_where()[uni])
       }
 
       counts.mean["ctree",] <- colMeans(var.count)
@@ -202,7 +202,11 @@ stable = function(formula,
       }else{
         res$where.ctree <- sapply(split(nn, nn$var),table)
       }
-      stability[,"ctree"] <- 1-length(unique(where.ctree))/n.rep
+      if(length(unique(where.ctree)) == 1){
+        stability[,"ctree"] <- 1
+      }else{
+        stability[,"ctree"] <- 1-length(unique(where.ctree))/n.rep
+      }
       similarity[,"ctree"] = mean(clus.mat)
     }
 
@@ -230,8 +234,8 @@ stable = function(formula,
         uni = unique(ids)
         boot = data[ids,]
         tt = prodlim::row.match(boot[uni,],data)
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$rpart.out$where[uni],
-                                                    out[[i]]$rpart.out$where[tt])
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$rpart.out$where[tt],
+                                                    out[[i]]$rpart.out$where[uni])
       }
 
 
@@ -258,7 +262,12 @@ stable = function(formula,
       }else{
         res$where.rpart <- sapply(split(nn, nn$var),table)
       }
-      stability[,"rpart"] <- 1-length(unique(where.rpart))/length(out)
+      if(length(unique(where.rpart)) == 1){
+        stability[,"rpart"] <- 1
+      }else{
+        stability[,"rpart"] <- 1-length(unique(where.rpart))/length(out)
+      }
+    # old  stability[,"rpart"] <- 1-length(unique(where.rpart))/length(out)
       similarity[,"rpart"] <- mean(clus.mat)
     }
 
@@ -276,8 +285,8 @@ stable = function(formula,
         uni = unique(ids)
         boot = data[ids,]
         tt = prodlim::row.match(boot[uni,],data)
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$evtree.out$fitted$`(fitted)`[uni],
-                                                    out[[i]]$evtree.out$fitted$`(fitted)`[tt])
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$evtree.out$fitted$`(fitted)`[tt],
+                                                    out[[i]]$evtree.out$fitted$`(fitted)`[uni])
       }
 
 
@@ -303,7 +312,12 @@ stable = function(formula,
       }else{
         res$where.evtree <- sapply(split(nn, nn$var),table)
       }
-      stability[,"evtree"] <- 1-length(unique(where.evtree))/length(out)
+      if(length(unique(where.evtree)) == 1){
+        stability[,"evtree"] <- 1
+      }else{
+        stability[,"evtree"] <- 1-length(unique(where.evtree))/length(out)
+      }
+     # stability[,"evtree"] <- 1-length(unique(where.evtree))/length(out)
       similarity[,"evtree"] <- mean(clus.mat)
     }
 
@@ -320,8 +334,8 @@ stable = function(formula,
         uni = unique(ids)
         boot = data[ids,]
         tt = prodlim::row.match(boot[uni,],data)
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`[uni],
-                                                    out[[i]]$ctreePrune.out$fitted$`(fitted)`[tt])
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`[tt],
+                                                    out[[i]]$ctreePrune.out$fitted$`(fitted)`[uni])
       }
 
       for(i in 1:length(out)){
@@ -346,7 +360,12 @@ stable = function(formula,
       }else{
         res$where.ctreePrune <- sapply(split(nn, nn$var),table)
       }
-      stability[,"ctreePrune"] <- 1-length(unique(where.ctreePrune))/length(out)
+      if(length(unique(where.ctreePrune)) == 1){
+        stability[,"ctreePrune"] <- 1
+      }else{
+        stability[,"ctreePrune"] <- 1-length(unique(where.ctreePrune))/length(out)
+      }
+     # stability[,"ctreePrune"] <- 1-length(unique(where.ctreePrune))/length(out)
       similarity[,"ctreePrune"] = mean(clus.mat)
     }
 

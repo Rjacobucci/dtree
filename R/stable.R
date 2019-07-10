@@ -333,9 +333,30 @@ stable = function(formula,
         ids <- sample(nrow(data),nrow(data),replace=TRUE)
         uni = unique(ids)
         boot = data[ids,]
+
+        #mm = ids %in% uni
+        #print(mm)
+
+        mm = match(uni,ids)
+
+
+       # print(row.names(out[[i]]$ctreePrune.out$fitted))
+       # print(row.names(orig.tree$ctreePrune.out$fitted))
+        #print(str(out[[i]]$ctreePrune.out$fitted))
+
+       # ids2 = row.names(out[[i]]$ctreePrune.out$fitted)
+       # mm =  row.names(orig.tree$ctreePrune.out$fitted) %in% ids2
+       # print(mm)
         tt = prodlim::row.match(boot[uni,],data)
-        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`[tt],
+        #tt = prodlim::row.match(ids2,row.names(orig.tree$ctreePrune.out$fitted))
+       # print(orig.tree$ctreePrune.out$fitted$`(fitted)`[1:10])
+       # print(out[[i]]$ctreePrune.out$fitted$`(fitted)`[1:10])
+
+        clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctreePrune.out$fitted$`(fitted)`[tt], #mm
                                                     out[[i]]$ctreePrune.out$fitted$`(fitted)`[uni])
+
+       # print(head(out[[i]]$ctreePrune.out$fitted[uni,],15))
+       # print(head(orig.tree$ctreePrune.out$fitted[mm,],15))
       }
 
       for(i in 1:length(out)){

@@ -84,8 +84,8 @@ ctreePrune_ret <- function(formula,data.train,data.test,class.response,subset,re
     }
 
 
-
-  out <- ctreePrune(formula=formula, data=train,qstar=best.tune)
+  out <- ctreePrune(formula=formula, data=data.train,qstar=best.tune)
+  #out <- ctreePrune(formula=formula, data=train,qstar=best.tune)
   ctreePrune.out <- ctreePrune.ret <- out$tree
 
   #min.error <- which(min(cp[,"xerror"]) == cp[,"xerror"])[1]

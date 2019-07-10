@@ -1,7 +1,7 @@
 Package: dtree
 Type: Package
 Title: Decision Trees
-Version: 0.9.0
+Version: 0.9.1
 Author: Ross Jacobucci
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Combines various decision tree algorithms, plus both
@@ -18,6 +18,7 @@ Depends: rpart,
          evtree,
          partykit,
          caret
+Imports: prodlim
 Suggests: randomForest,
           tree,
           MASS,

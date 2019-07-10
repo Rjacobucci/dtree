@@ -21,7 +21,7 @@
 #'
 #' @importFrom stats cor fitted lm predict terms glm binomial sd complete.cases na.pass median rnorm
 #' @importFrom party nodes where
-#' @import rpart evtree caret partykit
+#' @import rpart evtree caret partykit prodlim
 #' @export
 #'
 #' @examples

@@ -20,6 +20,7 @@
 #'        is allocated to test dataset. Defaults to 0.75
 #' @param weights Optional weights for each case.
 #' @importFrom parallel detectCores makeCluster clusterExport parLapply stopCluster
+#' @importFrom prodlim row.match
 #' @export
 #' @examples
 #' \dontrun{
@@ -189,7 +190,7 @@ stable = function(formula,
         ids <- sample(nrow(data),nrow(data),replace=TRUE)
         uni = unique(ids)
         boot = data[ids,]
-        tt = prodlim::row.match(boot[uni,],data)
+        tt = row.match(boot[uni,],data)
         clus.mat[i] = clusteval::cluster_similarity(orig.tree$ctree.out@get_where()[tt],
                                                     out[[i]]$ctree.out@get_where()[uni])
       }
@@ -233,7 +234,7 @@ stable = function(formula,
         ids <- sample(nrow(data),nrow(data),replace=TRUE)
         uni = unique(ids)
         boot = data[ids,]
-        tt = prodlim::row.match(boot[uni,],data)
+        tt = row.match(boot[uni,],data)
         clus.mat[i] = clusteval::cluster_similarity(orig.tree$rpart.out$where[tt],
                                                     out[[i]]$rpart.out$where[uni])
       }
@@ -284,7 +285,7 @@ stable = function(formula,
         ids <- sample(nrow(data),nrow(data),replace=TRUE)
         uni = unique(ids)
         boot = data[ids,]
-        tt = prodlim::row.match(boot[uni,],data)
+        tt = row.match(boot[uni,],data)
         clus.mat[i] = clusteval::cluster_similarity(orig.tree$evtree.out$fitted$`(fitted)`[tt],
                                                     out[[i]]$evtree.out$fitted$`(fitted)`[uni])
       }
@@ -347,7 +348,7 @@ stable = function(formula,
        # ids2 = row.names(out[[i]]$ctreePrune.out$fitted)
        # mm =  row.names(orig.tree$ctreePrune.out$fitted) %in% ids2
        # print(mm)
-        tt = prodlim::row.match(boot[uni,],data)
+        tt = row.match(boot[uni,],data)
         #tt = prodlim::row.match(ids2,row.names(orig.tree$ctreePrune.out$fitted))
        # print(orig.tree$ctreePrune.out$fitted$`(fitted)`[1:10])
        # print(out[[i]]$ctreePrune.out$fitted$`(fitted)`[1:10])
